@@ -1,0 +1,54 @@
+{
+  "name": "near-intents-agent-api-examples",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Runnable examples for the NEAR Intents Agent API",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "01:check-api": "tsx 01-getting-started/01-check-api.ts",
+    "01:list-tokens": "tsx 01-getting-started/02-list-tokens.ts",
+    "02:create-agent": "tsx 02-your-first-agent/01-create-agent.ts",
+    "02:inspect-agent": "tsx 02-your-first-agent/02-inspect-agent.ts",
+    "02:multiple-agents": "tsx 02-your-first-agent/03-multiple-agents.ts",
+    "03:near-policy-local": "tsx 03-owner-wallets/near/01-policy-local.ts",
+    "03:near-policy-provider": "tsx 03-owner-wallets/near/02-policy-provider.ts",
+    "03:evm-create-agent": "tsx 03-owner-wallets/evm/01-create-agent.ts",
+    "03:evm-policy-update": "tsx 03-owner-wallets/evm/02-policy-update.ts",
+    "04:issue-grant": "tsx 04-grants/01-issue-grant.ts",
+    "04:delegate-client": "tsx 04-grants/02-delegate-client.ts",
+    "04:revoke-and-audit": "tsx 04-grants/03-revoke-and-audit.ts",
+    "05:quote-and-swap": "tsx 05-money-moves/01-quote-and-swap.ts",
+    "05:transfer": "tsx 05-money-moves/02-transfer.ts",
+    "05:withdraw": "tsx 05-money-moves/03-withdraw.ts",
+    "05:deposit": "tsx 05-money-moves/04-deposit.ts",
+    "05:private-balance": "tsx 05-money-moves/05-private-balance.ts",
+    "05:approvals": "tsx 05-money-moves/06-approvals.ts",
+    "06:edit-policy": "tsx 06-policy-and-lifecycle/01-edit-policy.ts",
+    "06:freeze": "tsx 06-policy-and-lifecycle/02-freeze-and-unfreeze.ts",
+    "06:archive-and-delete": "tsx 06-policy-and-lifecycle/03-archive-and-delete.ts",
+    "08:error-taxonomy": "tsx 08-errors-and-recovery/01-error-taxonomy.ts",
+    "08:status-and-uncertain": "tsx 08-errors-and-recovery/02-status-and-uncertain.ts",
+    "08:idempotency": "tsx 08-errors-and-recovery/03-idempotency.ts",
+    "09:reads": "tsx 09-raw-http/01-reads.ts",
+    "09:owner-flow": "tsx 09-raw-http/02-owner-flow.ts",
+    "09:execution": "tsx 09-raw-http/03-execution.ts",
+    "10:bff-pattern": "tsx 10-recipes/01-bff-pattern.ts",
+    "10:timelocked-payout": "tsx 10-recipes/02-timelocked-payout.ts",
+    "10:ai-assistant": "tsx 10-recipes/03-ai-assistant.ts",
+    "10:full-journey": "tsx 10-recipes/04-full-journey.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@near-intents-agent-api/sdk": "^0.1.1",
+    "near-api-js": "^7.2.0",
+    "viem": "^2.56.8"
+  },
+  "devDependencies": {
+    "@types/node": "^24.12.0",
+    "tsx": "^4.23.13",
+    "typescript": "^5.9.3"
+  }
+}

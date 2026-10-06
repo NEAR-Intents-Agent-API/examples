@@ -1,0 +1,79 @@
+/**
+ * Read everything about one agent.
+ *
+ * What: agent identity, custody wallet, policy with live USD usage, public and confidential
+ *       balances, grants and recent history, in one pass.
+ * When: after creating an agent; this is the read shape your dashboard will render.
+ * Needs: `AGENT_API_KEY`, `AGENT_ID`.
+ * Run: `pnpm 02:inspect-agent`
+ *
+ * Reads report what their source can prove. `policy.policy` is the configured rulebook
+ * (`actions`, `assets`, `limits`, `destinations`, `budget`, `timelock_ms`); `policy.usage` is what
+ * has actually been counted, from one database snapshot. A per-transaction maximum never
+ * decreases; a window allowance does.
+ */
+import { agentApi } from "../support/client.js";
+import { banner, config, isMainModule, print, required } from "../support/config.js";
+
+export async function inspectAgent(agentId: string) {
+  const api = agentApi();
+  const [agent, wallet, policy, balances, confidential, grants, history] = await Promise.all([
+    api.getAgent(agentId),
+    api.getWallet(agentId),
+    api.getPolicy(agentId),
+    api.getBalances(agentId, { source: "public" }),
+    api.getBalances(agentId, { source: "confidential" }),
+    api.listGrants(agentId),
+    api.getHistory(agentId, { limit: 5 }),
+  ]);
+  const format = (list: typeof balances.balances) =>
+    list.map((entry) => ({
+      asset_id: entry.asset_id,
+      symbol: entry.symbol,
+      // Use balance_raw for arithmetic; balance is exact but for display.
+      balance_raw: entry.balance_raw,
+      balance: entry.balance ?? (entry.decimals === null ? null : undefined),
+      usd_price: entry.price,
+    }));
+  return {
+    agent: {
+      id: agent.id,
+      name: agent.name,
+      status: agent.status,
+      owner: agent.owner,
+      owner_account: agent.owner_account,
+      cooldowns: agent.cooldowns,
+    },
+    wallet,
+    policy: {
+      revision: policy.revision,
+      status: policy.status,
+      provider_policy_synced: policy.provider_policy_synced,
+      budget: policy.usage.budget,
+      timelock: policy.usage.timelock,
+      // The rulebook as signed: actions, assets, limits, destinations, budget and timelock_ms.
+      rules: policy.policy,
+    },
+    balances: { public: format(balances.balances), confidential: format(confidential.balances) },
+    grants: grants.map((grant) => ({
+      grant_id: grant.grant_id,
+      label: grant.label,
+      expires_at: grant.expires_at,
+      revoked_at: grant.revoked_at,
+    })),
+    history: history.data.map((entry) => ({
+      correlation_id: entry.correlation_id,
+      type: entry.type,
+      status: entry.status,
+      failure_code: entry.failure_code,
+      updated_at: entry.updated_at,
+    })),
+    hint: "Atomic amounts are shown raw; decimals come from 01:list-tokens.",
+  };
+}
+
+if (isMainModule(import.meta.url)) {
+  const agentId = required(config().agentId, "AGENT_ID");
+  banner([`Inspecting agent ${agentId}…`]);
+  void inspectAgent(agentId).then(print);
+}
