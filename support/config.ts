@@ -23,6 +23,8 @@ export type ExampleConfig = {
   agentId?: string;
   recipient?: string;
   signRecipient?: string;
+  /** The transparency log origin proofs must name; pinned by you, never read from the API. */
+  logOrigin: string;
   token: string;
   swapToToken: string;
   transferAmount: string;
@@ -83,6 +85,8 @@ export function config(): ExampleConfig {
     agentId: optional("AGENT_ID"),
     recipient: optional("AGENT_RECIPIENT"),
     signRecipient: optional("AGENT_SIGN_RECIPIENT"),
+    // A deployment's log is `<API host>/log`; the hosted API's is `api.agentsonintents.com/log`.
+    logOrigin: optional("AGENT_LOG_ORIGIN") ?? "api.agentsonintents.com/log",
     token: optional("AGENT_TOKEN") ?? "nep141:wrap.near",
     swapToToken: optional("AGENT_SWAP_TO") ?? "nep141:usdt.tether-token.near",
     transferAmount,
