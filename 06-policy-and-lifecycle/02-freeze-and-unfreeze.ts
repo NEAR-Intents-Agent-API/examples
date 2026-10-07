@@ -9,11 +9,13 @@
  * Freeze is the strongest account-level stop: every grant and every caller is refused with
  * `wallet_frozen` until the owner unfreezes. Freeze itself bypasses the policy cooldown;
  * unfreeze has an independent one. Redundant freeze/unfreeze returns
- * `wallet_already_frozen` / `wallet_already_unfrozen`.
+ * `wallet_already_frozen` / `wallet_already_unfrozen`. Because unfreezes are 10 minutes apart,
+ * the example checks `cooldowns.unfreeze_available_at` first instead of freezing an account it
+ * could not unfreeze.
  */
 import { type AgentApi, agentApi } from "../support/client.js";
 import { banner, config, isMainModule, print, required, requireWrites } from "../support/config.js";
-import { waitForStatus } from "../support/flow.js";
+import { assertCanUnfreeze, waitForStatus } from "../support/flow.js";
 import { loadGrant } from "../support/grant-store.js";
 import { loadOwner } from "../support/near-owner.js";
 import { signNearIntent } from "../support/sign-near-intent.js";
@@ -45,19 +47,19 @@ export async function freezeAndUnfreeze(agentId: string) {
   const api = agentApi();
   const { keyPair } = loadOwner();
   const stored = await loadGrant(agentId);
+  const recipient = required(settings.recipient, "AGENT_RECIPIENT");
+  await assertCanUnfreeze(api, agentId);
 
   const frozen = await control(api, agentId, "agent_freeze", keyPair, settings.nearRpcUrl);
   let refusal: string | null = null;
   try {
-    await api.forGrant(stored.token).transfer(
-      agentId,
-      {
-        asset: settings.token,
-        amount: settings.transferAmount,
-        recipient: required(settings.recipient, "AGENT_RECIPIENT"),
-      },
-      { idempotencyKey: crypto.randomUUID() },
-    );
+    await api
+      .forGrant(stored.token)
+      .transfer(
+        agentId,
+        { asset: settings.token, amount: settings.transferAmount, recipient },
+        { idempotencyKey: crypto.randomUUID() },
+      );
   } catch (error) {
     refusal =
       error instanceof Error ? ((error as { code?: string }).code ?? error.message) : String(error);

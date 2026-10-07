@@ -15,7 +15,7 @@
  */
 import { agentApi } from "../support/client.js";
 import { banner, config, isMainModule, print, required, requireWrites } from "../support/config.js";
-import { runOwnerIntent, settleExecution } from "../support/flow.js";
+import { runOwnerIntent, settleApprovedExecution } from "../support/flow.js";
 import { loadGrant } from "../support/grant-store.js";
 import { loadOwner } from "../support/near-owner.js";
 import { signNearIntent } from "../support/sign-near-intent.js";
@@ -51,8 +51,9 @@ export async function approvals(agentId: string) {
   if (voteStatus.status !== "SUCCESS")
     throw new Error(voteStatus.failure_code ?? `vote ${voteStatus.status}`);
 
-  // The vote unblocks the execution; observe the execution's own correlation id.
-  const settled = await settleExecution(api, Promise.resolve(execution));
+  // The vote unblocks the execution; observe the execution's own correlation id until it leaves
+  // PENDING_APPROVAL and settles.
+  const settled = await settleApprovedExecution(api, execution.correlation_id);
   return {
     request_type: pending.request_type,
     verdict: "approve",

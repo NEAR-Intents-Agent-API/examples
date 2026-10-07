@@ -10,6 +10,11 @@
  * The delay postpones work rather than refusing it. A queued execution reserves no USD budget;
  * the charge is decided when it dispatches. Editing the policy invalidates queued work admitted
  * under the previous revision.
+ *
+ * Policy changes are at least 10 minutes apart (`policy_change_throttled`), so this example sets
+ * the delay once and leaves it: rerunning reuses the existing delay, and you remove it later with
+ * `pnpm 06:edit-policy` (or a `policy_update` with `timelock_ms: 0`) once
+ * `cooldowns.policy_change_available_at` has passed.
  */
 import { type AgentApi, agentApi } from "../support/client.js";
 import { banner, config, isMainModule, print, required, requireWrites } from "../support/config.js";
@@ -42,16 +47,23 @@ export async function timelockedPayout(agentId: string) {
   const { keyPair } = loadOwner();
   const stored = await loadGrant(agentId);
 
-  // 1. Add a 60-second (60 000 ms) delay to every money action.
-  await ownerControl(
-    api,
-    await buildPolicyUpdate(api, agentId, (policy) => ({
-      ...policy,
-      timelock_ms: 60_000,
-    })),
-    keyPair,
-    settings.nearRpcUrl,
-  );
+  // 1. Add a 60-second (60 000 ms) delay to every money action, unless one is already set.
+  const current = await api.getPolicy(agentId);
+  const delayMs = current.policy?.timelock_ms ?? 0;
+  if (delayMs === 0) {
+    const { cooldowns } = await api.getAgent(agentId);
+    const availableAt = cooldowns.policy_change_available_at;
+    if (availableAt && Date.parse(availableAt) > Date.now())
+      throw new Error(
+        `Policy changes are throttled until ${availableAt}; run this example after that.`,
+      );
+    await ownerControl(
+      api,
+      await buildPolicyUpdate(api, agentId, (policy) => ({ ...policy, timelock_ms: 60_000 })),
+      keyPair,
+      settings.nearRpcUrl,
+    );
+  }
 
   // 2. Queue a transfer. It is accepted immediately but must wait for release.
   const queued = await api
@@ -73,17 +85,6 @@ export async function timelockedPayout(agentId: string) {
     settings.nearRpcUrl,
   );
 
-  // 5. Remove the delay so the account is back to immediate dispatch.
-  await ownerControl(
-    api,
-    await buildPolicyUpdate(api, agentId, (policy) => ({
-      ...policy,
-      timelock_ms: 0,
-    })),
-    keyPair,
-    settings.nearRpcUrl,
-  );
-
   return {
     queued: { correlation_id: queued.correlation_id, status: queued.status },
     scheduled_count: scheduled.data.length,
@@ -96,7 +97,8 @@ export async function timelockedPayout(agentId: string) {
       cancellation.type === "execution_cancel"
         ? cancellation.details.cancelled_correlation_id
         : queued.correlation_id,
-    note: "The delay is back to 0. Queued work was cancelled, not executed.",
+    timelock_ms: delayMs === 0 ? 60_000 : delayMs,
+    note: "Queued work was cancelled, not executed. The delay stays on the policy; remove it with 06:edit-policy after the policy cooldown.",
   };
 }
 

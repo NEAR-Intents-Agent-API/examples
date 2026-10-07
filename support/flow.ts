@@ -1,3 +1,4 @@
+import { setTimeout as sleep } from "node:timers/promises";
 import type { AgentApi, StatusResponse } from "@near-intents-agent-api/sdk";
 
 /**
@@ -56,6 +57,20 @@ export async function runOwnerIntent(
   return waitForStatus(api, generated.correlation_id, options.signal);
 }
 
+/**
+ * Refuses to start a freeze demo that could not unfreeze again. Unfreezes are at least 10
+ * minutes apart (`agent_unfreeze_throttled`), so freezing right after an unfreeze would leave the
+ * account frozen until `cooldowns.unfreeze_available_at`.
+ */
+export async function assertCanUnfreeze(api: AgentApi, agentId: string) {
+  const { cooldowns } = await api.getAgent(agentId);
+  const availableAt = cooldowns.unfreeze_available_at;
+  if (availableAt && Date.parse(availableAt) > Date.now())
+    throw new Error(
+      `This agent was unfrozen less than 10 minutes ago; it could not be unfrozen again until ${availableAt}. Run this example after that.`,
+    );
+}
+
 /** The agent id of a settled status, or an error naming the failure. */
 export function settledAgentId(status: StatusResponse): string {
   if (status.agent_id === null)
@@ -95,4 +110,20 @@ export async function settleExecution(
   const result = await execution;
   if (result.status === "PENDING_APPROVAL") return result as StatusResponse;
   return waitForStatus(api, result.correlation_id);
+}
+
+/**
+ * Follows an execution after the owner voted on it. The vote settles first; the execution leaves
+ * `PENDING_APPROVAL` once the custody provider records it, then settles like any other.
+ */
+export async function settleApprovedExecution(
+  api: AgentApi,
+  correlationId: string,
+  signal = AbortSignal.timeout(180_000),
+): Promise<StatusResponse> {
+  while (true) {
+    const status = await waitForStatus(api, correlationId, signal);
+    if (status.status !== "PENDING_APPROVAL") return status;
+    await sleep(2_000, undefined, { signal });
+  }
 }

@@ -9,7 +9,7 @@ withdrawals without executing and needs no idempotency key.
 | `01-quote-and-swap.ts` | `pnpm 05:quote-and-swap` | `actions: ["swap"]` | Always quotes; live swap when `AGENT_EXECUTE=true` |
 | `02-transfer.ts` | `pnpm 05:transfer` | `actions: ["transfer"]` + recipient | Moves between NEAR Intents accounts |
 | `03-withdraw.ts` | `pnpm 05:withdraw` | `actions: ["withdraw"]` + chain address | Previews, then withdraws cross-chain |
-| `04-deposit.ts` | `pnpm 05:deposit` | nothing | Issues an address; inbound funding needs no grant |
+| `04-deposit.ts` | `pnpm 05:deposit` | nothing | Issues an address (`origin_asset`, optional `amount`); no grant, refunds go to the agent |
 | `05-private-balance.ts` | `pnpm 05:private-balance` | `confidential: true` | Public ↔ confidential balance |
 | `06-approvals.ts` | `pnpm 05:approvals` | `owner_approval: true` | `PENDING_APPROVAL` → owner vote → settle |
 

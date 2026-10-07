@@ -1,8 +1,9 @@
 # NEAR Intents Agent API — Examples
 
-Runnable, standalone examples for the NEAR Intents Agent API. You need two things: the API URL
-of your deployment and one API key (`naa_…`), both from your dashboard. Paste them into `.env`
-and run.
+Runnable, standalone examples for the NEAR Intents Agent API. You need one API key (`naa_…`):
+sign up on the [partner dashboard](https://partners-production-069b.up.railway.app), open
+**API keys** and create one (it is shown once). Paste it into `.env` and run. The examples talk
+to the hosted mainnet API (`https://api.demo.agentsonintents.com`) unless you set `AGENT_API_URL`.
 
 This folder is self-contained: it does not import this repository's internal packages, tests or
 apps. Copy it anywhere, `pnpm install`, and it works.
@@ -12,7 +13,7 @@ apps. Copy it anywhere, `pnpm install`, and it works.
 ```sh
 cd examples
 cp .env.example .env
-# Edit .env: AGENT_API_URL and AGENT_API_KEY. Add owner keys for write examples.
+# Edit .env: AGENT_API_KEY. Add owner keys for write examples.
 pnpm install
 pnpm 01:check-api        # read-only: verifies connectivity and your key
 pnpm 01:list-tokens      # read-only: the asset catalog
@@ -78,7 +79,7 @@ signing). Passkeys use `@simplewebauthn/browser` in your frontend.
 |---|---|
 | `config.ts` | Loads `.env`, typed config, `requireWrites`, `print` |
 | `client.ts` | `agentApi()` built from `.env` |
-| `flow.ts` | `runOwnerIntent`, `waitForStatus`, `buildPolicyUpdate`, `settleExecution` |
+| `flow.ts` | `runOwnerIntent`, `waitForStatus`, `buildPolicyUpdate`, `settleExecution`, `settleApprovedExecution`, `assertCanUnfreeze` |
 | `policy.ts` | `transferPolicy` (tight) and `fullAccessPolicy` (broad), both complete `Policy` objects |
 | `near-owner.ts` / `sign-near-intent.ts` | NEAR owner: keypair, NEP-413, NEP-366 |
 | `evm-owner.ts` | EVM owner: `viem`, EIP-712 |

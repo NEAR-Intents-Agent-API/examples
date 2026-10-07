@@ -8,9 +8,11 @@
  * Run: `pnpm 05:transfer`
  *
  * Idempotency keys name one logical request. Pass a stable key (`order-123`) when your system
- * already identifies the transfer; a generated key is fine for a one-off. On a transport error,
- * retry with the *same* key — never a new one.
+ * already identifies the transfer; a generated key is fine for a one-off. Never derive it from the
+ * agent and recipient alone: a second payment to the same person would replay the first. On a
+ * transport error, retry with the *same* key — never a new one.
  */
+import { createIdempotencyKey } from "@near-intents-agent-api/sdk";
 import { agentApi } from "../support/client.js";
 import { banner, config, isMainModule, print, required, requireWrites } from "../support/config.js";
 import { settleExecution } from "../support/flow.js";
@@ -28,7 +30,7 @@ export async function transfer(agentId: string) {
     bot.transfer(
       agentId,
       { asset: settings.token, amount: settings.transferAmount, recipient },
-      { idempotencyKey: `example-transfer-${agentId}-${recipient}` },
+      { idempotencyKey: createIdempotencyKey() },
     ),
   );
   return {

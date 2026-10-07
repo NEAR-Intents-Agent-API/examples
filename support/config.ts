@@ -8,6 +8,12 @@ import { fileURLToPath } from "node:url";
  * needs and fails with the variable name. Reads never require `AGENT_ALLOW_WRITES`.
  */
 
+/**
+ * The hosted API that partner-dashboard keys belong to. Set it explicitly: the SDK's built-in
+ * default points at a different deployment.
+ */
+export const hostedApiUrl = "https://api.demo.agentsonintents.com";
+
 const envPath = fileURLToPath(new URL("../.env", import.meta.url));
 if (existsSync(envPath)) process.loadEnvFile(envPath);
 
@@ -71,7 +77,7 @@ export function config(): ExampleConfig {
   if (!/^[0-9]+$/.test(transferAmount))
     throw new Error("AGENT_TRANSFER_AMOUNT must be atomic token units (a decimal integer)");
   return {
-    apiUrl: httpOrigin("AGENT_API_URL", "http://localhost:3000"),
+    apiUrl: httpOrigin("AGENT_API_URL", hostedApiUrl),
     apiKey: optional("AGENT_API_KEY"),
     ownerAccountId: optional("AGENT_OWNER_ACCOUNT_ID"),
     ownerPrivateKey: optional("AGENT_OWNER_PRIVATE_KEY"),
