@@ -21,6 +21,7 @@ per field in `errors`.
 | Destination outside the account rule | `policy_destination_denied` | Owner adds it to `policy.destinations`; no new grant |
 | Provider policy refuses | `policy_denied` | Change the policy (owner) |
 | USD budget exhausted | `spend_budget_exceeded` | Wait for the window or raise the cap |
+| Outside the owner's schedule | `policy_schedule_denied` | Submit again at `availableAt` with a new key, or owner changes `schedule` |
 | Policy not applied yet | `policy_not_ready` | Wait for `provider_policy_synced` |
 | Wallet busy | `wallet_busy` | Retry after the current dispatch |
 | Frozen | `wallet_frozen` | Owner unfreezes |

@@ -29,6 +29,7 @@
     "06:edit-policy": "tsx 06-policy-and-lifecycle/01-edit-policy.ts",
     "06:freeze": "tsx 06-policy-and-lifecycle/02-freeze-and-unfreeze.ts",
     "06:archive-and-delete": "tsx 06-policy-and-lifecycle/03-archive-and-delete.ts",
+    "06:schedule": "tsx 06-policy-and-lifecycle/04-schedule.ts",
     "08:error-taxonomy": "tsx 08-errors-and-recovery/01-error-taxonomy.ts",
     "08:status-and-uncertain": "tsx 08-errors-and-recovery/02-status-and-uncertain.ts",
     "08:idempotency": "tsx 08-errors-and-recovery/03-idempotency.ts",
@@ -42,7 +43,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@near-intents-agent-api/sdk": "^0.2.0",
+    "@near-intents-agent-api/sdk": "^0.3.0",
     "near-api-js": "^7.2.0",
     "viem": "^2.56.8"
   },

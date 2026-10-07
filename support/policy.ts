@@ -10,7 +10,7 @@ import { intentsAccount } from "./destinations.js";
  * action or adding a destination is one signature and every grant can use it at once, without a
  * new grant.
  *
- * The policy is always sent complete; every field is required:
+ * The policy is always sent complete; every field is required except `schedule`:
  * - `frozen`: a frozen account refuses every action until the owner unfreezes it.
  * - `actions`: any of `swap`, `transfer`, `withdraw`. Deposits are always allowed and deletion is
  *   owner-only.
@@ -23,6 +23,8 @@ import { intentsAccount } from "./destinations.js";
  * - `destinations`: `{ mode: "any" | "only" | "except", list }`.
  * - `budget`: USD caps over rolling day, week and month windows across every asset, or `null`.
  * - `timelock_ms`: how long every delegated action waits before it runs (0 to 30 days).
+ * - `schedule`: optional weekly windows on the owner's clock when money actions may run (`only`)
+ *   or are paused (`except`). Omitted means any time.
  */
 
 const noBudget = { daily_usd: null, weekly_usd: null, monthly_usd: null };
@@ -62,7 +64,7 @@ export function transferPolicy(input: {
  * the shape an owner picks when the agent should be genuinely useful, with a hard ceiling.
  *
  * `budget` windows are rolling and enforced by the API in one ledger shared by every grant.
- * `null` leaves a window uncapped. `budget` and `timelock_ms` are enforced by the API itself, so
+ * `null` leaves a window uncapped. `budget`, `timelock_ms` and `schedule` are enforced by the API itself, so
  * changing only them needs one signature but no blockchain transaction.
  */
 export function fullAccessPolicy(input: {
