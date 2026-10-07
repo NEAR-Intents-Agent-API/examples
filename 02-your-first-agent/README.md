@@ -30,7 +30,7 @@ on-chain updates (NEAR), `eip712` (EVM), `webauthn` (passkey). See
 
 The single policy signed at creation caps everything the account can ever do, across every future
 grant. Every field is required: `frozen`, `actions`, `confidential`, `owner_approval`, `assets`,
-`limits`, `max_actions_per_hour`, `destinations`, `budget` and `timelock_ms`. The tight starter
+`limits`, `max_actions_per_hour`, `destinations`, `budget` and `timelock_ms`; `schedule` is optional. The tight starter
 policy allows one asset, one destination and transfers only; deleting the account stays
 owner-only. Edit it any time with `policy_update`
 (see [06 · Policy and lifecycle](../06-policy-and-lifecycle/README.md)).

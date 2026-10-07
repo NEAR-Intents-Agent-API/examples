@@ -8,11 +8,8 @@ import { fileURLToPath } from "node:url";
  * needs and fails with the variable name. Reads never require `AGENT_ALLOW_WRITES`.
  */
 
-/**
- * The hosted API that partner-dashboard keys belong to. Set it explicitly: the SDK's built-in
- * default points at a different deployment.
- */
-export const hostedApiUrl = "https://api.demo.agentsonintents.com";
+/** The hosted mainnet API, also the SDK's default `baseUrl`. */
+export const hostedApiUrl = "https://api.agentsonintents.com";
 
 const envPath = fileURLToPath(new URL("../.env", import.meta.url));
 if (existsSync(envPath)) process.loadEnvFile(envPath);

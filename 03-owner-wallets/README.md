@@ -16,12 +16,12 @@ The API decides, and `intent.standard` tells you. Never assume:
 | Action | NEAR | EVM | Passkey |
 |---|---|---|---|
 | Create agent, provider policy change, freeze/unfreeze | `nep366` | `eip712` | `webauthn` |
-| Update of destinations, budget or timelock only, grant issue/revoke, approval, archive | `nep413` | `eip712` | `webauthn` |
+| Update of destinations, budget, timelock or schedule only, grant issue/revoke, approval, archive | `nep413` | `eip712` | `webauthn` |
 
 `nep366` and the EVM/passkey wallet requests are **on-chain** and gasless for the owner: the API's
 sponsor submits them. `nep413` and its EVM/passkey consent counterparts are pure off-chain
 signatures. A policy update that changes only what the API enforces (`destinations`, `budget`,
-`timelock_ms`) returns `transaction_hash: null` on success.
+`timelock_ms`, `schedule`) returns `transaction_hash: null` on success.
 
 ## NEAR owner
 

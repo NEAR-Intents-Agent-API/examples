@@ -1,9 +1,9 @@
 # NEAR Intents Agent API — Examples
 
 Runnable, standalone examples for the NEAR Intents Agent API. You need one API key (`naa_…`):
-sign up on the [partner dashboard](https://partners-production-069b.up.railway.app), open
-**API keys** and create one (it is shown once). Paste it into `.env` and run. The examples talk
-to the hosted mainnet API (`https://api.demo.agentsonintents.com`) unless you set `AGENT_API_URL`.
+create a partner API key in the [partner dashboard](https://partners.near-intents.org/) (**API keys**; it is shown once). Paste it into
+`.env` and run. The examples talk to the hosted mainnet API (`https://api.agentsonintents.com`)
+unless you set `AGENT_API_URL`.
 
 This folder is self-contained: it does not import this repository's internal packages, tests or
 apps. Copy it anywhere, `pnpm install`, and it works.

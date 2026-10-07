@@ -13,7 +13,7 @@ on writes, `X-Grant-Token` on delegated calls, JSON bodies, JSON:API errors. Eve
 ## curl cheatsheet
 
 ```sh
-API=https://your-agent-api.example.com
+API=https://api.agentsonintents.com
 KEY=naa_…
 
 # Public reads
