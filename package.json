@@ -30,12 +30,18 @@
     "06:freeze": "tsx 06-policy-and-lifecycle/02-freeze-and-unfreeze.ts",
     "06:archive-and-delete": "tsx 06-policy-and-lifecycle/03-archive-and-delete.ts",
     "06:schedule": "tsx 06-policy-and-lifecycle/04-schedule.ts",
+    "07:enable-signing": "tsx 07-identity-signing/01-enable-signing.ts",
+    "07:sign-and-verify": "tsx 07-identity-signing/02-sign-and-verify.ts",
+    "07:refusals": "tsx 07-identity-signing/03-refusals.ts",
+    "07:disable-signing": "tsx 07-identity-signing/04-disable-signing.ts",
     "08:error-taxonomy": "tsx 08-errors-and-recovery/01-error-taxonomy.ts",
     "08:status-and-uncertain": "tsx 08-errors-and-recovery/02-status-and-uncertain.ts",
     "08:idempotency": "tsx 08-errors-and-recovery/03-idempotency.ts",
+    "08:recover": "tsx 08-errors-and-recovery/04-recover.ts",
     "09:reads": "tsx 09-raw-http/01-reads.ts",
     "09:owner-flow": "tsx 09-raw-http/02-owner-flow.ts",
     "09:execution": "tsx 09-raw-http/03-execution.ts",
+    "09:sign": "tsx 09-raw-http/04-sign.ts",
     "10:bff-pattern": "tsx 10-recipes/01-bff-pattern.ts",
     "10:timelocked-payout": "tsx 10-recipes/02-timelocked-payout.ts",
     "10:ai-assistant": "tsx 10-recipes/03-ai-assistant.ts",
@@ -43,7 +49,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@near-intents-agent-api/sdk": "^0.3.0",
+    "@near-intents-agent-api/sdk": "^0.4.0",
     "near-api-js": "^7.2.0",
     "viem": "^2.56.8"
   },

@@ -14,7 +14,7 @@
  * plus `timelock_ms`, again when a timelock releases, and again at dispatch. Outside the schedule
  * the API answers `403 policy_schedule_denied` with `meta.available_at`, the next moment it
  * opens. Nothing was sent: submit again at that time with a **new** idempotency key. Deposits,
- * message signing and owner approval votes are never held.
+ * identity signing (`sign`) and owner approval votes are never held.
  *
  * Policy changes are at least 10 minutes apart, so a schedule already on the policy is kept.
  * Remove it with a `policy_update` that omits `schedule`.

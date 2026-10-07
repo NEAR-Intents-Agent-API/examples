@@ -1,7 +1,8 @@
 /**
  * Check your connection to the API.
  *
- * What: confirms the URL is reachable, the network is mainnet, and your API key is valid.
+ * What: confirms the URL is reachable, the network is mainnet, your API key is valid, and the
+ *       token catalog loads.
  * When: the first thing to run after pasting `AGENT_API_URL` and `AGENT_API_KEY`.
  * Needs: `AGENT_API_URL`, `AGENT_API_KEY`.
  * Run: `pnpm 01:check-api`
@@ -17,10 +18,12 @@ export async function checkApi() {
   const api = agentApi();
 
   const health = await fetch(`${apiUrl}/health`).then((response) => response.json());
-  const [network, whoami, quota] = await Promise.all([
+  const [network, whoami, quota, tokens] = await Promise.all([
     api.getNetwork(),
     api.whoami(),
     api.getPartnerQuota(),
+    // The SDK form of `GET /v1/tokens`; `01:list-tokens` reads it with plain fetch and no key.
+    api.getTokens(),
   ]);
 
   return {
@@ -33,6 +36,7 @@ export async function checkApi() {
       usage: quota.usage,
       observed_at: quota.observed_at,
     },
+    token_count: tokens.length,
   };
 }
 

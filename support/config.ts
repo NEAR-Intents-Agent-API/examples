@@ -22,6 +22,7 @@ export type ExampleConfig = {
   ownerEvmPrivateKey?: string;
   agentId?: string;
   recipient?: string;
+  signRecipient?: string;
   token: string;
   swapToToken: string;
   transferAmount: string;
@@ -81,6 +82,7 @@ export function config(): ExampleConfig {
     ownerEvmPrivateKey: optional("AGENT_OWNER_EVM_PRIVATE_KEY"),
     agentId: optional("AGENT_ID"),
     recipient: optional("AGENT_RECIPIENT"),
+    signRecipient: optional("AGENT_SIGN_RECIPIENT"),
     token: optional("AGENT_TOKEN") ?? "nep141:wrap.near",
     swapToToken: optional("AGENT_SWAP_TO") ?? "nep141:usdt.tether-token.near",
     transferAmount,

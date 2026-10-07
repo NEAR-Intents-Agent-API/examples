@@ -1,8 +1,9 @@
 /**
  * Read everything about one agent.
  *
- * What: agent identity, custody wallet, policy with live USD usage, public and confidential
- *       balances, grants and recent history, in one pass.
+ * What: agent identity, custody wallet and its NEAR address, policy with live USD usage and its
+ *       signed revisions, public and confidential balances, grants, recent history, and the
+ *       custody provider's own request records, in one pass.
  * When: after creating an agent; this is the read shape your dashboard will render.
  * Needs: `AGENT_API_KEY`, `AGENT_ID`.
  * Run: `pnpm 02:inspect-agent`
@@ -11,20 +12,40 @@
  * (`actions`, `assets`, `limits`, `destinations`, `budget`, `timelock_ms`); `policy.usage` is what
  * has actually been counted, from one database snapshot. A per-transaction maximum never
  * decreases; a window allowance does.
+ *
+ * `listProviderRecords` returns the custody provider's records unchanged (`requests`, `audit`,
+ * `deposits`, `deposit_history`). Use it to reconcile, not to drive your UI: its shape is the
+ * provider's, not this API's.
  */
 import { agentApi } from "../support/client.js";
 import { banner, config, isMainModule, print, required } from "../support/config.js";
 
 export async function inspectAgent(agentId: string) {
   const api = agentApi();
-  const [agent, wallet, policy, balances, confidential, grants, history] = await Promise.all([
+  const [
+    agent,
+    wallet,
+    address,
+    policy,
+    revisions,
+    balances,
+    confidential,
+    grants,
+    history,
+    providerRequests,
+  ] = await Promise.all([
     api.getAgent(agentId),
     api.getWallet(agentId),
+    // The custody wallet's NEAR account, e.g. for explorers. Fund the agent with `05:deposit`.
+    api.getAddress(agentId, "near"),
     api.getPolicy(agentId),
+    // Newest first; pass `next_cursor` as `cursor` for older revisions.
+    api.getPolicyHistory(agentId, { limit: 5 }),
     api.getBalances(agentId, { source: "public" }),
     api.getBalances(agentId, { source: "confidential" }),
     api.listGrants(agentId),
     api.getHistory(agentId, { limit: 5 }),
+    api.listProviderRecords(agentId, "requests", { limit: 5 }),
   ]);
   const format = (list: typeof balances.balances) =>
     list.map((entry) => ({
@@ -45,6 +66,7 @@ export async function inspectAgent(agentId: string) {
       cooldowns: agent.cooldowns,
     },
     wallet,
+    address: address.address,
     policy: {
       revision: policy.revision,
       status: policy.status,
@@ -54,6 +76,10 @@ export async function inspectAgent(agentId: string) {
       // The rulebook as signed: actions, assets, limits, destinations, budget and timelock_ms.
       rules: policy.policy,
     },
+    policy_revisions: revisions.data.map((revision) => ({
+      revision: revision.revision,
+      status: revision.status,
+    })),
     balances: { public: format(balances.balances), confidential: format(confidential.balances) },
     grants: grants.map((grant) => ({
       grant_id: grant.grant_id,
@@ -68,6 +94,7 @@ export async function inspectAgent(agentId: string) {
       failure_code: entry.failure_code,
       updated_at: entry.updated_at,
     })),
+    provider_requests: providerRequests.data,
     hint: "Atomic amounts are shown raw; decimals come from 01:list-tokens.",
   };
 }

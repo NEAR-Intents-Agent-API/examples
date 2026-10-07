@@ -41,6 +41,8 @@ export async function approvals(agentId: string) {
 
   const approvalId = execution.details.approval_id;
   if (!approvalId) throw new Error("pending approval without approval_id");
+  // An owner dashboard lists every request waiting for a vote; one approval reads by id.
+  const queue = await api.listApprovals(agentId);
   const pending = await api.getApproval(agentId, approvalId);
   const voteStatus = await runOwnerIntent(
     api,
@@ -55,6 +57,11 @@ export async function approvals(agentId: string) {
   // PENDING_APPROVAL and settles.
   const settled = await settleApprovedExecution(api, execution.correlation_id);
   return {
+    waiting: queue.map((approval) => ({
+      approval_id: approval.approval_id,
+      request_type: approval.request_type,
+      expires_at: approval.expires_at,
+    })),
     request_type: pending.request_type,
     verdict: "approve",
     execution: {

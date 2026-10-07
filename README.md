@@ -35,7 +35,8 @@ the folders as a reference.
 | [`04-grants`](04-grants/README.md) | Delegated access: issue, use, revoke | Yes |
 | [`05-money-moves`](05-money-moves/README.md) | Swap, transfer, withdraw, deposit, private, approvals | Yes |
 | [`06-policy-and-lifecycle`](06-policy-and-lifecycle/README.md) | Edit rules, schedule hours, freeze, archive, delete | Yes |
-| [`08-errors-and-recovery`](08-errors-and-recovery/README.md) | Error codes, statuses, idempotency | Some |
+| [`07-identity-signing`](07-identity-signing/README.md) | Agent proves its NEAR account to a service (NEP-413) | Some |
+| [`08-errors-and-recovery`](08-errors-and-recovery/README.md) | Error codes, statuses, idempotency, recovery | Some |
 | [`09-raw-http`](09-raw-http/README.md) | The same API with plain `fetch` + curl | Some |
 | [`10-recipes`](10-recipes/README.md) | BFF, timelocks, AI assistants, full journey | Yes |
 
@@ -54,7 +55,7 @@ the folders as a reference.
 
 Every core flow exists in both forms:
 
-- SDK: what `support/client.ts` wraps, used by sections 01–06, 08, 10.
+- SDK: what `support/client.ts` wraps, used by sections 01–08, 10.
 - Raw HTTP: section [09-raw-http](09-raw-http/README.md), including a curl cheatsheet and a
   parity table. `GET /openapi.json` has every schema; `GET /llms.txt` is a compact guide for
   LLM callers.
@@ -86,6 +87,7 @@ signing). Passkeys use `@simplewebauthn/browser` in your frontend.
 | `raw-http.ts` | Plain `fetch` transport |
 | `destinations.ts` | Typed policy destinations |
 | `grant-store.ts` | Example-only grant token cache (`.intents/`) |
+| `identity.ts` | Identity challenges and NEP-413 signature verification (the relying party's side) |
 | `format.ts` | Atomic ↔ decimal conversion |
 
 ## The model in one paragraph
@@ -95,5 +97,7 @@ usage ledger. **Access belongs to a grant; rules belong to the account.** Your b
 API key; the owner signs once to create the agent and to issue each grant. The agent executes
 inside NEAR Intents (public or confidential) under all controls at once: the grant (who may act,
 until when), the policy (`actions`, `assets`, `limits`, `destinations`, owner approval, freeze),
-the USD `budget`, the `timelock_ms` execution delay and the owner's `schedule` of hours. None overrides another. The API handles authorization,
+the USD `budget`, the `timelock_ms` execution delay and the owner's `schedule` of hours. None overrides another.
+The optional `sign` rule lets the agent prove its account to services the owner lists; it is off
+by default and never covers the NEAR Intents contracts. The API handles authorization,
 owner-signed intents, sponsored gas, operation state and reconciliation.
