@@ -5,7 +5,7 @@ Prove connectivity and learn the token catalog. These examples are read-only and
 
 | Example | Run | What it shows |
 |---|---|---|
-| `01-check-api.ts` | `pnpm 01:check-api` | `GET /v1/network`, `/health`, and the authenticated `whoami` |
+| `01-check-api.ts` | `pnpm 01:check-api` | `GET /v1/network`, `/health`, the authenticated `whoami`, quota and the token catalog via the SDK |
 | `02-list-tokens.ts` | `pnpm 01:list-tokens` | `GET /v1/tokens`: asset ids, decimals, USD price and quote freshness |
 
 `GET /v1/tokens` is public and returns **exactly** the assets agent wallets support. `asset_id` is

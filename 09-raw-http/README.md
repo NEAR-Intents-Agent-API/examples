@@ -9,6 +9,7 @@ on writes, `X-Grant-Token` on delegated calls, JSON bodies, JSON:API errors. Eve
 | `01-reads.ts` | `pnpm 09:reads` | Network, tokens, agent, policy — plain `fetch` |
 | `02-owner-flow.ts` | `pnpm 09:owner-flow` | generate → sign → submit → status over raw HTTP |
 | `03-execution.ts` | `pnpm 09:execution` | A delegated action with grant and idempotency headers |
+| `04-sign.ts` | `pnpm 09:sign` | Identity signing with `X-Grant-Token`, then verifying the signature |
 
 ## curl cheatsheet
 
@@ -41,6 +42,11 @@ curl "$API/v1/agents/$AGENT_ID/transfer" \
   -H "X-API-Key: $KEY" -H "X-Grant-Token: $GRANT_TOKEN" \
   -H "Idempotency-Key: payout-42" -H "Content-Type: application/json" \
   -d '{"asset":"nep141:wrap.near","amount":"1","recipient":"bob.near"}'
+
+# Identity signing: grant token, no idempotency key. `message` is the canonical challenge JSON.
+curl "$API/v1/agents/$AGENT_ID/sign" \
+  -H "X-API-Key: $KEY" -H "X-Grant-Token: $GRANT_TOKEN" -H "Content-Type: application/json" \
+  -d '{"recipient":"login.example.near","message":"{\"audience\":\"login.example.near\",\"chain\":\"near\",\"challenge\":\"<64 hex>\",\"domain\":\"near-intents-agent-api.identity.v1\",\"expires_at_ms\":<ms>,\"issued_at_ms\":<ms>,\"purpose\":\"identity\"}"}'
 ```
 
 ## Parity with the SDK
@@ -52,6 +58,8 @@ curl "$API/v1/agents/$AGENT_ID/transfer" \
 | `api.getStatus(cid, { waitMs })` | `GET /v1/status?correlation_id=…&wait_ms=…` |
 | `api.forGrant(t).swap(id, body, { idempotencyKey })` | `POST /v1/agents/{agent_id}/swap` + `X-Grant-Token` + `Idempotency-Key` |
 | `api.deposit(id, body, { idempotencyKey })` | `POST /v1/agents/{agent_id}/deposit` (no grant) |
+| `api.forGrant(t).sign(id, body)` | `POST /v1/agents/{agent_id}/sign` + `X-Grant-Token` |
+| `api.forGrant(t).recover(id, body, { idempotencyKey })` | `POST /v1/agents/{agent_id}/recover` + `X-Grant-Token` + original `Idempotency-Key` |
 
 `GET /openapi.json` is the full schema; `GET /llms.txt` is a compact guide for LLM callers.
 

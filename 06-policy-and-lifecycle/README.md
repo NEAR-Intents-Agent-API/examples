@@ -35,7 +35,7 @@ fail with `policy_not_ready`.
 - **API-enforced** (`destinations`, `budget`, `timelock_ms`, `schedule`): off-chain owner message,
   `transaction_hash: null`.
 - **Provider-enforced** (`frozen`, `actions`, `confidential`, `owner_approval`, `assets`, `limits`,
-  `max_actions_per_hour`): on-chain wallet request, submitted gaslessly by the API's sponsor. The
+  `max_actions_per_hour`, `sign`): on-chain wallet request, submitted gaslessly by the API's sponsor. The
   same request shape; the API picks the standard.
 
 ## Schedule
@@ -55,7 +55,7 @@ schedule: {
 belongs to its start day, and `24:00` closes the day. Hours follow daylight saving. An action is
 judged when it would run (after `timelock_ms`), again at timelock release and at dispatch.
 Outside the schedule the API answers `403 policy_schedule_denied` with `availableAt`; submit again
-then with a new idempotency key. Deposits, message signing and approval votes are never held.
+then with a new idempotency key. Deposits, identity signing (`sign`) and approval votes are never held.
 Omit `schedule` in a `policy_update` to remove it.
 
 ## Cooldowns
@@ -70,4 +70,4 @@ Deletion previews the exact assets that would be lost (`public`, `confidential`,
 `assets_lost`). The owner empties the wallet first; the beneficiary receives only the account's
 native NEAR. See `03-archive-and-delete.ts`.
 
-Next: [08 · Errors and recovery](../08-errors-and-recovery/README.md).
+Next: [07 · Identity signing](../07-identity-signing/README.md).

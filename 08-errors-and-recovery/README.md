@@ -7,6 +7,7 @@ Read this before writing retry logic. Mistakes here cost real money.
 | `01-error-taxonomy.ts` | `pnpm 08:error-taxonomy` | `AgentApiError` fields and the codes you will actually see |
 | `02-status-and-uncertain.ts` | `pnpm 08:status-and-uncertain` | Observing a status, `refresh`, and when recovery is legal |
 | `03-idempotency.ts` | `pnpm 08:idempotency` | Stable keys, persisting before dispatch, replay behavior |
+| `04-recover.ts` | `pnpm 08:recover <record.json>` | The three facts that make `/recover` legal, then recovery with the original key and grant |
 
 ## Branch on `code`, never `title`
 
@@ -29,6 +30,7 @@ per field in `errors`.
 | Deposit quota | `deposit_quota_exceeded` | Back off until `availableAt` |
 | Throttled | `policy_change_throttled`, `agent_unfreeze_throttled` | Back off until `availableAt` |
 | Stale policy revision | `policy_revision_conflict` | Read again, generate fresh |
+| Signing refused | `signing_recipient_forbidden`, `signing_policy_denied`, `signing_identity_challenge_invalid` | See [07 · Identity signing](../07-identity-signing/README.md#refusals) |
 
 ## The status machine
 
@@ -47,8 +49,10 @@ Rules:
 - `UNCERTAIN`: **never submit a new request with a new key.** Observe the original correlation id.
 - `NEEDS_REVIEW`: stop polling. Inspect `details.reason`, keep the budget charged, then after
   provider/manual resolution call `getStatus(correlation_id, { refresh: true })`.
-- `/recover`: only dispatches work that provably never reached the provider. It is not an
-  override for uncertainty and needs the original idempotency key.
+- `/recover`: only dispatches work that provably never reached the provider (`UNCERTAIN`, no
+  `dispatch_committed_at`, no `details.provider_request_id`). It is not an override for
+  uncertainty: it needs the original body, idempotency key and grant, and otherwise answers
+  `operation_not_recoverable`. See `04-recover.ts`.
 
 ## Idempotency in one paragraph
 
