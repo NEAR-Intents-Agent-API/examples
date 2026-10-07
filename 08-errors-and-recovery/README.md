@@ -53,6 +53,8 @@ Rules:
   `dispatch_committed_at`, no `details.provider_request_id`). It is not an override for
   uncertainty: it needs the original body, idempotency key and grant, and otherwise answers
   `operation_not_recoverable`. See `04-recover.ts`.
+- To prove afterwards what was recorded for an execution, fetch its operation proof and verify it
+  offline: [11 · Verify operations](../11-verify-operations/README.md).
 
 ## Idempotency in one paragraph
 

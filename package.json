@@ -46,6 +46,7 @@
     "10:timelocked-payout": "tsx 10-recipes/02-timelocked-payout.ts",
     "10:ai-assistant": "tsx 10-recipes/03-ai-assistant.ts",
     "10:full-journey": "tsx 10-recipes/04-full-journey.ts",
+    "11:verify-operation": "tsx 11-verify-operations/01-verify-operation.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

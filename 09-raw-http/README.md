@@ -58,6 +58,7 @@ curl "$API/v1/agents/$AGENT_ID/sign" \
 | `api.getStatus(cid, { waitMs })` | `GET /v1/status?correlation_id=…&wait_ms=…` |
 | `api.forGrant(t).swap(id, body, { idempotencyKey })` | `POST /v1/agents/{agent_id}/swap` + `X-Grant-Token` + `Idempotency-Key` |
 | `api.deposit(id, body, { idempotencyKey })` | `POST /v1/agents/{agent_id}/deposit` (no grant) |
+| `api.getOperationProof(id, cid)` | `GET /v1/agents/{agent_id}/operations/{correlation_id}/proof` |
 | `api.forGrant(t).sign(id, body)` | `POST /v1/agents/{agent_id}/sign` + `X-Grant-Token` |
 | `api.forGrant(t).recover(id, body, { idempotencyKey })` | `POST /v1/agents/{agent_id}/recover` + `X-Grant-Token` + original `Idempotency-Key` |
 

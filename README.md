@@ -39,6 +39,7 @@ the folders as a reference.
 | [`08-errors-and-recovery`](08-errors-and-recovery/README.md) | Error codes, statuses, idempotency, recovery | Some |
 | [`09-raw-http`](09-raw-http/README.md) | The same API with plain `fetch` + curl | Some |
 | [`10-recipes`](10-recipes/README.md) | BFF, timelocks, AI assistants, full journey | Yes |
+| [`11-verify-operations`](11-verify-operations/README.md) | Prove an execution's audit trail offline (transparency log) | No |
 
 ## Safety
 
@@ -55,7 +56,7 @@ the folders as a reference.
 
 Every core flow exists in both forms:
 
-- SDK: what `support/client.ts` wraps, used by sections 01–08, 10.
+- SDK: what `support/client.ts` wraps, used by sections 01–08, 10, 11.
 - Raw HTTP: section [09-raw-http](09-raw-http/README.md), including a curl cheatsheet and a
   parity table. `GET /openapi.json` has every schema; `GET /llms.txt` is a compact guide for
   LLM callers.
