@@ -34,7 +34,7 @@ the folders as a reference.
 | [`03-owner-wallets`](03-owner-wallets/README.md) | NEAR, EVM and passkey owners | Yes |
 | [`04-grants`](04-grants/README.md) | Delegated access: issue, use, revoke | Yes |
 | [`05-money-moves`](05-money-moves/README.md) | Swap, transfer, withdraw, deposit, private, approvals | Yes |
-| [`06-policy-and-lifecycle`](06-policy-and-lifecycle/README.md) | Edit rules, freeze, archive, delete | Yes |
+| [`06-policy-and-lifecycle`](06-policy-and-lifecycle/README.md) | Edit rules, schedule hours, freeze, archive, delete | Yes |
 | [`08-errors-and-recovery`](08-errors-and-recovery/README.md) | Error codes, statuses, idempotency | Some |
 | [`09-raw-http`](09-raw-http/README.md) | The same API with plain `fetch` + curl | Some |
 | [`10-recipes`](10-recipes/README.md) | BFF, timelocks, AI assistants, full journey | Yes |
@@ -95,5 +95,5 @@ usage ledger. **Access belongs to a grant; rules belong to the account.** Your b
 API key; the owner signs once to create the agent and to issue each grant. The agent executes
 inside NEAR Intents (public or confidential) under all controls at once: the grant (who may act,
 until when), the policy (`actions`, `assets`, `limits`, `destinations`, owner approval, freeze),
-the USD `budget` and the `timelock_ms` execution delay. None overrides another. The API handles authorization,
+the USD `budget`, the `timelock_ms` execution delay and the owner's `schedule` of hours. None overrides another. The API handles authorization,
 owner-signed intents, sponsored gas, operation state and reconciliation.
