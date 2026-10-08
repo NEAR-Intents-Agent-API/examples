@@ -16,7 +16,7 @@ import { verifyOperationProof } from "@near-intents-agent-api/sdk";
 
 const proof = await api.getOperationProof(agentId, correlationId); // an `op_…` execution id
 const verified = verifyOperationProof(proof, "api.agentsonintents.com/log"); // pin the origin
-// verified.proven: [{ index, fields: { action, createdAt, … }, checkpoint, cosignedAt }]
+// verified.proven: [{ index, fields: { action, createdAt, … }, checkpoint, cosignedAt, evidence }]
 // verified.pending / verified.unlogged: counts of events not (yet) provable
 ```
 
@@ -25,9 +25,12 @@ const verified = verifyOperationProof(proof, "api.agentsonintents.com/log"); // 
 1. the notary keys belong to the pinned origin and match the birth attestation's `report_data`;
 2. each checkpoint carries the log's signature and the notary's timestamped cosignature;
 3. each event's opening hashes to a leaf that checkpoint includes, and names this execution, its
-   action and its time.
+   action and its time;
+4. each event's `evidence`, the result it recorded with any settlement transaction hashes, hashes to
+   the opening's `evidenceHash`. It comes back parsed; `null` when the API served none.
 
-A proof that does not hold throws `NoteError` or `ProofError`.
+A proof that does not hold, or evidence altered after it was committed, throws `NoteError` or
+`ProofError`.
 
 | Event status | Meaning |
 |---|---|
