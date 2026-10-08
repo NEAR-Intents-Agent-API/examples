@@ -3,7 +3,7 @@
  *
  * What: creates a deposit address that credits the agent's Intents balance, then polls.
  * When: funding an agent from another chain or token.
- * Needs: `AGENT_ALLOW_WRITES=true`, `AGENT_API_KEY`, `AGENT_ID`. No grant: inbound funding never
+ * Needs: `AGENT_ALLOW_WRITES=true`, `NEAR_INTENTS_AGENT_API_KEY`, `AGENT_ID`. No grant: inbound funding never
  *        spends agent funds.
  * Run: `pnpm 05:deposit`
  *

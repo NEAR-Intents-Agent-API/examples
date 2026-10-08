@@ -4,7 +4,7 @@
  * What: loads the token from `04:issue-grant` and runs a dry swap under it.
  * When: this is the client shape you give an AI assistant, a scheduled job or a dashboard
  *       session. One grant per session; never share one token across sessions.
- * Needs: `AGENT_API_KEY`, `AGENT_ID`; the stored grant from `04:issue-grant`.
+ * Needs: `NEAR_INTENTS_AGENT_API_KEY`, `AGENT_ID`; the stored grant from `04:issue-grant`.
  * Run: `pnpm 04:delegate-client`
  *
  * `api.forGrant(token)` returns a client that sends `X-Grant-Token` on delegated calls only.

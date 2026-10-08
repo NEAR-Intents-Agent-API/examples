@@ -32,7 +32,7 @@ function authHeaders(request: RawRequest): Headers {
   const headers = new Headers(request.headers);
   const { apiKey } = config();
   if (!request.allowMissingKey) {
-    headers.set("x-api-key", required(apiKey, "AGENT_API_KEY"));
+    headers.set("x-api-key", required(apiKey, "NEAR_INTENTS_AGENT_API_KEY"));
   } else if (apiKey) {
     headers.set("x-api-key", apiKey);
   }

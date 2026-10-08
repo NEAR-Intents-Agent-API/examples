@@ -77,8 +77,8 @@ export function config(): ExampleConfig {
   if (!/^[0-9]+$/.test(transferAmount))
     throw new Error("AGENT_TRANSFER_AMOUNT must be atomic token units (a decimal integer)");
   return {
-    apiUrl: httpOrigin("AGENT_API_URL", hostedApiUrl),
-    apiKey: optional("AGENT_API_KEY"),
+    apiUrl: httpOrigin("NEAR_INTENTS_AGENT_API_URL", hostedApiUrl),
+    apiKey: optional("NEAR_INTENTS_AGENT_API_KEY"),
     ownerAccountId: optional("AGENT_OWNER_ACCOUNT_ID"),
     ownerPrivateKey: optional("AGENT_OWNER_PRIVATE_KEY"),
     ownerEvmPrivateKey: optional("AGENT_OWNER_EVM_PRIVATE_KEY"),

@@ -1,7 +1,7 @@
 # 01 · Getting started
 
 Prove connectivity and learn the token catalog. These examples are read-only and need only
-`AGENT_API_URL` and `AGENT_API_KEY` in `examples/.env`.
+`NEAR_INTENTS_AGENT_API_URL` and `NEAR_INTENTS_AGENT_API_KEY` in `examples/.env`.
 
 | Example | Run | What it shows |
 |---|---|---|

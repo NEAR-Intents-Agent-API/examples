@@ -3,7 +3,7 @@
  *
  * What: reads a correlation id and classifies the result: keep polling, stop, or reconcile.
  * When: every integration needs this classification before it retries anything.
- * Needs: `AGENT_API_KEY`; a `CORRELATION_ID` argument or a fresh execution from the grant.
+ * Needs: `NEAR_INTENTS_AGENT_API_KEY`; a `CORRELATION_ID` argument or a fresh execution from the grant.
  * Run: `pnpm 08:status-and-uncertain` (optionally pass a correlation id as argv[2])
  *
  * The rule that protects funds: an UNCERTAIN operation may already have executed. Submitting a

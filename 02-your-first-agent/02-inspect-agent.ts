@@ -5,7 +5,7 @@
  *       signed revisions, public and confidential balances, grants, recent history, and the
  *       custody provider's own request records, in one pass.
  * When: after creating an agent; this is the read shape your dashboard will render.
- * Needs: `AGENT_API_KEY`, `AGENT_ID`.
+ * Needs: `NEAR_INTENTS_AGENT_API_KEY`, `AGENT_ID`.
  * Run: `pnpm 02:inspect-agent`
  *
  * Reads report what their source can prove. `policy.policy` is the configured rulebook

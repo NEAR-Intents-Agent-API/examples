@@ -3,7 +3,7 @@
  *
  * What: network, tokens, one agent, its policy, and quota via plain fetch.
  * When: in a runtime where you prefer not to add a dependency, or to debug the wire.
- * Needs: `AGENT_API_KEY`; `AGENT_ID` for the agent read.
+ * Needs: `NEAR_INTENTS_AGENT_API_KEY`; `AGENT_ID` for the agent read.
  * Run: `pnpm 09:reads`
  */
 import { banner, config, isMainModule, print } from "../support/config.js";
