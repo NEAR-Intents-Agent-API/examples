@@ -40,8 +40,8 @@ A proof that does not hold, or evidence altered after it was committed, throws `
 
 ## Pin the origin
 
-The origin is `<API host>/log`: `api.agentsonintents.com/log` for the hosted API. Set
-`AGENT_LOG_ORIGIN` for another deployment. Never take it from the proof itself; that is the value
+The origin is `<API host>/log`: `api.agentsonintents.com/log` for the hosted API. It defaults to
+the host of `NEAR_INTENTS_AGENT_API_URL`; set `AGENT_LOG_ORIGIN` to pin it explicitly. Never take it from the proof itself; that is the value
 the check compares against. A deployment without a log answers `501 transparency_log_disabled`.
 
 ## The last step: attested keys

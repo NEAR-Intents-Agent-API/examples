@@ -1,5 +1,5 @@
 import { AgentApi, type AgentApiOptions } from "@near-intents-agent-api/sdk";
-import { config, required } from "./config.js";
+import { config } from "./config.js";
 
 // Re-export the whole typed contract so examples can import client helpers and types together.
 export * from "@near-intents-agent-api/sdk";
@@ -15,7 +15,7 @@ export function agentApi(overrides: Partial<AgentApiOptions> = {}): AgentApi {
   const { apiUrl, apiKey } = config();
   return new AgentApi({
     baseUrl: overrides.baseUrl ?? apiUrl,
-    apiKey: overrides.apiKey ?? required(apiKey, "NEAR_INTENTS_AGENT_API_KEY"),
+    apiKey: overrides.apiKey ?? apiKey,
     ...overrides,
   });
 }
