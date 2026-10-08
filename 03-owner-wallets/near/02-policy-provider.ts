@@ -1,7 +1,7 @@
 /**
- * Change custody-provider rules with a NEAR owner (NEP-366).
+ * Change wallet-provider rules with a NEAR owner (NEP-366).
  *
- * What: enables the `swap` action and raises the per-transaction cap. The custody provider
+ * What: enables the `swap` action and raises the per-transaction cap. The wallet provider
  *       enforces both, so the owner signs a gasless NEP-366 delegate action and the API's
  *       sponsor submits it on chain.
  * When: whenever the rulebook itself changes (actions, assets, limits, owner approval).

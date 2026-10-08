@@ -9,7 +9,7 @@
  *        valid recipient when the policy has a `sign` rule.
  * Run: `pnpm 07:refusals`
  *
- * None of these requests reaches the custody provider and none signs anything, so this example
+ * None of these requests reaches the wallet provider and none signs anything, so this example
  * needs no `AGENT_ALLOW_WRITES`. The API checks in this order, so a request with several problems
  * gets the first code: recipient forbidden, challenge invalid, policy ready and not frozen, grant,
  * `sign` rule, recipient list.

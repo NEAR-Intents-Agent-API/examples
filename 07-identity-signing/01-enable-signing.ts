@@ -8,7 +8,7 @@
  * Needs: `AGENT_ALLOW_WRITES=true`, owner keys, `AGENT_ID`, `AGENT_SIGN_RECIPIENT`.
  * Run: `pnpm 07:enable-signing`
  *
- * Signing is off until the owner adds `sign`. The custody provider enforces the same recipient
+ * Signing is off until the owner adds `sign`. The wallet provider enforces the same recipient
  * list, so this is an on-chain policy change (`nep366`, gas sponsored by the API). Show the owner a
  * warning before they sign it: a listed service may treat the signature as the account logging in.
  *

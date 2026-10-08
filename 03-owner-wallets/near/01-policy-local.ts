@@ -7,7 +7,7 @@
  * Needs: `AGENT_ALLOW_WRITES=true`, owner keys, `AGENT_ID`.
  * Run: `pnpm 03:near-policy-local`
  *
- * Because nothing the custody provider enforces changes, the API returns
+ * Because nothing the wallet provider enforces changes, the API returns
  * `intent.standard: "nep413"` and the success receipt has `transaction_hash: null`. No blockchain transaction is sent. The same
  * off-chain signature path serves grant issuance and approvals.
  */

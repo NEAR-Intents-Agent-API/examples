@@ -114,7 +114,7 @@ export async function settleExecution(
 
 /**
  * Follows an execution after the owner voted on it. The vote settles first; the execution leaves
- * `PENDING_APPROVAL` once the custody provider records it, then settles like any other.
+ * `PENDING_APPROVAL` once the wallet provider records it, then settles like any other.
  */
 export async function settleApprovedExecution(
   api: AgentApi,

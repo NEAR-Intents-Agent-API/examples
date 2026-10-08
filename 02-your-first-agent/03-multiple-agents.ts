@@ -1,7 +1,7 @@
 /**
  * Create several agents for one owner.
  *
- * What: loops the onboarding flow and prints every agent id, with its own custody wallet and
+ * What: loops the onboarding flow and prints every agent id, with its own agent wallet and
  *       policy. Shows that an owner can hold many independent accounts.
  * When: when one backend serves many of an owner's agents (or many external users).
  * Needs: `AGENT_ALLOW_WRITES=true`, owner keys, `AGENT_RECIPIENT`, `AGENT_COUNT` (default 2).

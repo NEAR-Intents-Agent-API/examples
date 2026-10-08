@@ -6,7 +6,7 @@
  * Needs: `AGENT_ALLOW_WRITES=true`, `AGENT_OWNER_EVM_PRIVATE_KEY`, `AGENT_ID`.
  * Run: `pnpm 03:evm-policy-update`
  *
- * The signing standard depends on what changes: changes the custody provider enforces (actions,
+ * The signing standard depends on what changes: changes the wallet provider enforces (actions,
  * assets, limits, owner approval) use the on-chain wallet request (still EIP-712); changes only the
  * API enforces (destinations, budget, timelock) use an EIP-712 consent message. Both look like
  * `intent.standard: "eip712"` to you; sign `intent.payload` as typed data either way.

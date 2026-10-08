@@ -7,7 +7,7 @@
  * Needs: `AGENT_ALLOW_WRITES=true`, owner keys, `AGENT_ID`; `AGENT_EXECUTE=true` for deletion.
  * Run: `pnpm 06:archive-and-delete`
  *
- * Archive does not delete custody — it stops the account being usable while keeping the wallet
+ * Archive does not delete the agent wallet — it stops the account being usable while keeping the wallet
  * and its history. Deletion previews exactly what would be destroyed. If `assets_lost` is true,
  * withdraw the public and confidential balances first: this example refuses to continue.
  */

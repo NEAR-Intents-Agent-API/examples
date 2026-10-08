@@ -6,7 +6,7 @@ Create one agent account, sign once, and read everything it owns.
 |---|---|---|
 | `01-create-agent.ts` | `pnpm 02:create-agent` | The owner onboarding flow: `agent_create` → wallet signs → submit → active |
 | `02-inspect-agent.ts` | `pnpm 02:inspect-agent` | Agent, wallet and NEAR address, policy and its revisions, balances, history and provider records in one read |
-| `03-multiple-agents.ts` | `pnpm 02:multiple-agents` | One owner, several agents (each with its own custody wallet) |
+| `03-multiple-agents.ts` | `pnpm 02:multiple-agents` | One owner, several agents (each with its own agent wallet) |
 
 ## The owner flow
 

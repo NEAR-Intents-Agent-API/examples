@@ -1,9 +1,9 @@
 /**
  * Read everything about one agent.
  *
- * What: agent identity, custody wallet and its NEAR address, policy with live USD usage and its
+ * What: agent identity, agent wallet and its NEAR address, policy with live USD usage and its
  *       signed revisions, public and confidential balances, grants, recent history, and the
- *       custody provider's own request records, in one pass.
+ *       wallet provider's own request records, in one pass.
  * When: after creating an agent; this is the read shape your dashboard will render.
  * Needs: `NEAR_INTENTS_AGENT_API_KEY`, `AGENT_ID`.
  * Run: `pnpm 02:inspect-agent`
@@ -13,7 +13,7 @@
  * has actually been counted, from one database snapshot. A per-transaction maximum never
  * decreases; a window allowance does.
  *
- * `listProviderRecords` returns the custody provider's records unchanged (`requests`, `audit`,
+ * `listProviderRecords` returns the wallet provider's records unchanged (`requests`, `audit`,
  * `deposits`, `deposit_history`). Use it to reconcile, not to drive your UI: its shape is the
  * provider's, not this API's.
  */
@@ -36,7 +36,7 @@ export async function inspectAgent(agentId: string) {
   ] = await Promise.all([
     api.getAgent(agentId),
     api.getWallet(agentId),
-    // The custody wallet's NEAR account, e.g. for explorers. Fund the agent with `05:deposit`.
+    // The agent wallet's NEAR account, e.g. for explorers. Fund the agent with `05:deposit`.
     api.getAddress(agentId, "near"),
     api.getPolicy(agentId),
     // Newest first; pass `next_cursor` as `cursor` for older revisions.

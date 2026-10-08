@@ -93,7 +93,7 @@ signing). Passkeys use `@simplewebauthn/browser` in your frontend.
 
 ## The model in one paragraph
 
-An **agent** is one financial account: a custody wallet, one owner-signed **policy**, and one USD
+An **agent** is one agent account: a agent wallet, one owner-signed **policy**, and one USD
 usage ledger. **Access belongs to a grant; rules belong to the account.** Your backend holds the
 API key; the owner signs once to create the agent and to issue each grant. The agent executes
 inside NEAR Intents (public or confidential) under all controls at once: the grant (who may act,

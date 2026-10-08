@@ -23,7 +23,7 @@ policy: { ...current.policy, sign: { recipients: ["login.example.near"] } }
 
 - **Omitted** means the agent signs nothing (`policy_action_denied`). `recipients` needs at least
   one account, so remove the field to turn signing off.
-- **Listed** recipients are the only services the agent may sign for. The custody provider
+- **Listed** recipients are the only services the agent may sign for. The wallet provider
   enforces the same list, so changing `sign` is an on-chain policy change (`nep366` for NEAR
   owners, sponsored by the API) and the 10-minute policy cooldown applies.
 - **Any live grant** may sign for a listed recipient. Revoke the grant to stop one caller.

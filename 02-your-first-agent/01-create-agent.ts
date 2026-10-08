@@ -8,7 +8,7 @@
  * Run: `pnpm 02:create-agent`
  *
  * One signature creates the account: the same policy binds the provider's rules, the USD budget
- * and the execution delay. The agent gets its own custody wallet; the owner keeps the NEAR
+ * and the execution delay. The agent gets its own agent wallet; the owner keeps the NEAR
  * account and keys.
  */
 import { mkdir, writeFile } from "node:fs/promises";

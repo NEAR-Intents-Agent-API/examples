@@ -29,7 +29,7 @@ Two runnable examples need an owner ed25519 key and its NEAR account (FullAccess
 the API sponsors dispatch):
 
 - `near/01-policy-local.ts` — change budget and timelock only: NEP-413, no transaction.
-- `near/02-policy-provider.ts` — change what the custody provider enforces (actions, limits):
+- `near/02-policy-provider.ts` — change what the wallet provider enforces (actions, limits):
   NEP-366 delegate, submitted by the sponsor.
 
 ## EVM owner
