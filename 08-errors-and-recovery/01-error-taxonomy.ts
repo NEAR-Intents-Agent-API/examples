@@ -3,7 +3,7 @@
  *
  * What: triggers several documented refusals and prints the structured error for each.
  * When: when writing your error handling — this is exactly what reaches your catch block.
- * Needs: `AGENT_API_KEY`, `AGENT_ID`, stored grant (for one of the refusals).
+ * Needs: `NEAR_INTENTS_AGENT_API_KEY`, `AGENT_ID`, stored grant (for one of the refusals).
  * Run: `pnpm 08:error-taxonomy`
  *
  * Errors are JSON:API documents. Branch on `error.code`; `retryable`, `availableAt` (from `meta.available_at`) and

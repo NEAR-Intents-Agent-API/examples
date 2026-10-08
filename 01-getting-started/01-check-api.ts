@@ -3,8 +3,8 @@
  *
  * What: confirms the URL is reachable, the network is mainnet, your API key is valid, and the
  *       token catalog loads.
- * When: the first thing to run after pasting `AGENT_API_URL` and `AGENT_API_KEY`.
- * Needs: `AGENT_API_URL`, `AGENT_API_KEY`.
+ * When: the first thing to run after pasting `NEAR_INTENTS_AGENT_API_URL` and `NEAR_INTENTS_AGENT_API_KEY`.
+ * Needs: `NEAR_INTENTS_AGENT_API_URL`, `NEAR_INTENTS_AGENT_API_KEY`.
  * Run: `pnpm 01:check-api`
  *
  * `/health`, `/v1/network` and `/v1/tokens` are public. `/v1/whoami` is the API-key check: it

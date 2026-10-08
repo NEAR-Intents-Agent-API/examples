@@ -2,8 +2,7 @@
 
 Runnable, standalone examples for the NEAR Intents Agent API. You need one API key (`naa_…`):
 create a partner API key in the [partner dashboard](https://partners.near-intents.org/) (**API keys**; it is shown once). Paste it into
-`.env` and run. The examples talk to the hosted mainnet API (`https://api.agentsonintents.com`)
-unless you set `AGENT_API_URL`.
+`.env` with the API URL (the hosted mainnet API is `https://api.agentsonintents.com`) and run.
 
 This folder is self-contained: it does not import this repository's internal packages, tests or
 apps. Copy it anywhere, `pnpm install`, and it works.
@@ -13,7 +12,7 @@ apps. Copy it anywhere, `pnpm install`, and it works.
 ```sh
 cd examples
 cp .env.example .env
-# Edit .env: AGENT_API_KEY. Add owner keys for write examples.
+# Edit .env: NEAR_INTENTS_AGENT_API_URL and NEAR_INTENTS_AGENT_API_KEY. Add owner keys for write examples.
 pnpm install
 pnpm 01:check-api        # read-only: verifies connectivity and your key
 pnpm 01:list-tokens      # read-only: the asset catalog
@@ -79,7 +78,8 @@ signing). Passkeys use `@simplewebauthn/browser` in your frontend.
 
 | Module | Purpose |
 |---|---|
-| `config.ts` | Loads `.env`, typed config, `requireWrites`, `print` |
+| `env.ts` | Validates the environment once (zod), the same API URL and key rules as the demo and agent-connect |
+| `config.ts` | Typed config from `env.ts`, `requireWrites`, `print` |
 | `client.ts` | `agentApi()` built from `.env` |
 | `flow.ts` | `runOwnerIntent`, `waitForStatus`, `buildPolicyUpdate`, `settleExecution`, `settleApprovedExecution`, `assertCanUnfreeze` |
 | `policy.ts` | `transferPolicy` (tight) and `fullAccessPolicy` (broad), both complete `Policy` objects |
