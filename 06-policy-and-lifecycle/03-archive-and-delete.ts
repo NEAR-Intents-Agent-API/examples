@@ -1,26 +1,28 @@
 /**
  * Archive, restore and delete an agent.
  *
- * What: archives and restores the account; on `AGENT_EXECUTE=true`, deletes it if no balance
- *       would be lost.
+ * What: freezes, archives, unfreezes and restores the account; on `AGENT_EXECUTE=true`, deletes it
+ *       if no balance would be lost.
  * When: retiring an account. Archive is reversible; deletion is not.
  * Needs: `AGENT_ALLOW_WRITES=true`, owner keys, `AGENT_ID`; `AGENT_EXECUTE=true` for deletion.
  * Run: `pnpm 06:archive-and-delete`
  *
  * Archive does not delete the agent wallet — it stops the account being usable while keeping the wallet
- * and its history. Deletion previews exactly what would be destroyed. If `assets_lost` is true,
- * withdraw the public and confidential balances first: this example refuses to continue.
+ * and its history. `agent_archive` needs a frozen account, and `agent_restore` needs an unfrozen
+ * one, so the example freezes first and unfreezes before restoring. Deletion previews exactly what
+ * would be destroyed. If `assets_lost` is true, withdraw the public and confidential balances
+ * first: this example refuses to continue.
  */
 import { type AgentApi, agentApi } from "../support/client.js";
 import { banner, config, isMainModule, print, required, requireWrites } from "../support/config.js";
-import { waitForStatus } from "../support/flow.js";
+import { assertCanUnfreeze, waitForStatus } from "../support/flow.js";
 import { loadOwner } from "../support/near-owner.js";
 import { signNearIntent } from "../support/sign-near-intent.js";
 
 async function control(
   api: AgentApi,
   agentId: string,
-  type: "agent_archive" | "agent_restore" | "agent_delete",
+  type: "agent_freeze" | "agent_unfreeze" | "agent_archive" | "agent_restore" | "agent_delete",
   keyPair: ReturnType<typeof loadOwner>["keyPair"],
   rpcUrl: string,
 ) {
@@ -48,9 +50,12 @@ export async function archiveAndDelete(agentId: string) {
   const settings = config();
   const api = agentApi();
   const { keyPair } = loadOwner();
+  await assertCanUnfreeze(api, agentId);
 
+  await control(api, agentId, "agent_freeze", keyPair, settings.nearRpcUrl);
   const archived = await control(api, agentId, "agent_archive", keyPair, settings.nearRpcUrl);
   const afterArchive = await api.getAgent(agentId);
+  await control(api, agentId, "agent_unfreeze", keyPair, settings.nearRpcUrl);
   const restored = await control(api, agentId, "agent_restore", keyPair, settings.nearRpcUrl);
   const afterRestore = await api.getAgent(agentId);
 
