@@ -22,7 +22,7 @@ export async function createMultipleAgents() {
   const api = agentApi();
   const { keyPair, owner } = loadOwner();
   const recipient = required(settings.recipient, "AGENT_RECIPIENT");
-  const policy = transferPolicy({ owner, recipient, token: settings.token });
+  const policy = transferPolicy({ recipient, token: settings.token });
   const agents = [];
   for (let index = 1; index <= settings.agentCount; index += 1) {
     const status = await runOwnerIntent(

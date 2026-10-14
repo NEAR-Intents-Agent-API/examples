@@ -26,7 +26,6 @@ export async function createAgent() {
   const { keyPair, owner } = loadOwner();
   const recipient = required(settings.recipient, "AGENT_RECIPIENT");
   const policy = transferPolicy({
-    owner,
     recipient,
     token: settings.token,
     requireApproval: settings.requireApproval,

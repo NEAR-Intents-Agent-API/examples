@@ -35,7 +35,7 @@ export async function createEvmOwnedAgent() {
       type: "agent_create",
       name: "EVM-owned agent",
       owner,
-      policy: transferPolicy({ owner, recipient, token: settings.token }),
+      policy: transferPolicy({ recipient, token: settings.token }),
     },
     (generated) => signEvmIntent(account, generated),
     { idempotencyKey: crypto.randomUUID() },
