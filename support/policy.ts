@@ -1,4 +1,4 @@
-import type { Destination, OwnerWallet, Policy } from "@near-intents-agent-api/sdk";
+import type { Destination, Policy } from "@near-intents-agent-api/sdk";
 import { intentsAccount } from "./destinations.js";
 
 /**
@@ -15,7 +15,8 @@ import { intentsAccount } from "./destinations.js";
  * - `actions`: any of `swap`, `transfer`, `withdraw`. Deposits are always allowed and deletion is
  *   owner-only.
  * - `confidential`: also allows shielding, unshielding and the confidential form of each action.
- * - `owner_approval`: outgoing money actions (not deposits) wait for the owner's approval vote (NEAR owners only).
+ * - `owner_approval`: outgoing money actions (not deposits) wait for the owner's approval vote
+ *   (NEAR, passkey and EVM owners).
  * - `assets`: `"any"`, or the exact asset ids the agent may touch.
  * - `limits`: optional per-asset caps (`per_transaction`, `hourly`, `daily`, `monthly`) in atomic
  *   units.
@@ -34,17 +35,14 @@ const noBudget = { daily_usd: null, weekly_usd: null, monthly_usd: null };
  * the account later. Use it for the first onboarding example.
  */
 export function transferPolicy(input: {
-  owner: OwnerWallet;
   /** The only NEAR Intents account this agent may send to. */
   recipient: string;
   token?: string;
-  /** Every transfer waits for the owner's approval (NEAR owners only). */
+  /** Every transfer waits for the owner's approval. */
   requireApproval?: boolean;
 }): Policy {
   const token = input.token ?? "nep141:wrap.near";
   const requireApproval = input.requireApproval ?? false;
-  if (requireApproval && input.owner.type !== "near")
-    throw new Error("Owner approval requires a NEAR owner");
   return {
     frozen: false,
     actions: ["transfer"],
@@ -78,7 +76,7 @@ export function fullAccessPolicy(input: {
   /** Milliseconds every money action waits before dispatch (0 to 2 592 000 000). */
   timelockMs?: number;
   frozen?: boolean;
-  /** Every money action waits for the owner's approval (NEAR owners only). */
+  /** Every money action waits for the owner's approval. */
   ownerApproval?: boolean;
 }): Policy {
   const assets = input.assets ?? "any";

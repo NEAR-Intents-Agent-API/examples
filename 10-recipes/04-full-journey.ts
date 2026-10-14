@@ -33,7 +33,7 @@ export async function fullJourney() {
       type: "agent_create",
       name: "Full journey agent",
       owner,
-      policy: transferPolicy({ owner, recipient, token: settings.token }),
+      policy: transferPolicy({ recipient, token: settings.token }),
     },
     sign,
     { idempotencyKey: crypto.randomUUID() },
