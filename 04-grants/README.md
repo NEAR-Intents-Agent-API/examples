@@ -45,6 +45,8 @@ as `X-Grant-Token` on delegated calls only.
 - `policy_destination_denied` — the account's destination rule.
 - `policy_denied` — the account's provider policy (assets, limits, hourly rate).
 - `spend_budget_exceeded` — the account's USD budget.
+- `policy_limit_exceeded`, `policy_action_limit_exceeded` — the per-asset limits and hourly action
+  cap, which the API counts across every grant (shield and unshield included).
 
 Raising the USD budget never lifts a per-asset limit. Change the rule that refused; grants never
 need reissuing for it.

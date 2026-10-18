@@ -1,7 +1,8 @@
 /**
  * Withdraw to an external chain address.
  *
- * What: previews fees, then withdraws when `AGENT_EXECUTE=true`.
+ * What: previews fees, then withdraws when `AGENT_EXECUTE=true`. The preview runs under the grant
+ *       and its own idempotency key, which the SDK creates; previews are limited per agent per day.
  * When: moving value out of NEAR Intents to a chain address.
  * Needs: `AGENT_ID`, a stored grant, and a policy whose `actions` include `withdraw` and whose
  *        `destinations` allow the exact chain address;
