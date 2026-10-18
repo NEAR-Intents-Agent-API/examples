@@ -2,7 +2,9 @@
 
 Delegated actions run through a grant (or, for deposits, just the API key). Every action returns
 a `correlation_id`; follow it with `GET /v1/status` until terminal. `dry: true` previews swaps and
-withdrawals without executing and needs no idempotency key.
+withdrawals without executing. A swap quote needs only the API key. A withdrawal preview needs the
+grant and an idempotency key (the SDK creates one), and each agent gets 20 previews per rolling 24
+hours, failed ones included.
 
 | Example | Run | Policy must allow | Notes |
 |---|---|---|---|
