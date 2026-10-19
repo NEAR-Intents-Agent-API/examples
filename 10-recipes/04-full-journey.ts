@@ -53,7 +53,7 @@ export async function fullJourney() {
       policy: {
         ...current.policy,
         actions: [...current.policy.actions, "swap"] as ("swap" | "transfer" | "withdraw")[],
-        // A swap needs its output asset to be allowed too.
+        // A swap can buy an unlisted asset; listing it lets the agent sell or move it later.
         assets:
           current.policy.assets === "any"
             ? ("any" as const)

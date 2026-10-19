@@ -33,7 +33,7 @@ export async function updateProviderPolicy(agentId: string) {
   const request = await buildPolicyUpdate(api, agentId, (policy) => ({
     ...policy,
     actions: policy.actions.includes("swap") ? policy.actions : [...policy.actions, "swap"],
-    // A swap needs its output asset to be allowed too.
+    // A swap can buy an unlisted asset; listing it lets the agent sell or move it later.
     assets:
       policy.assets === "any" ? "any" : [...new Set([...policy.assets, settings.swapToToken])],
     limits: {
