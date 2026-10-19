@@ -7,12 +7,12 @@ import { JsonRpcProvider, PublicKey } from "near-api-js";
  *
  * The agent proves to another service (the *relying party*) that it controls its NEAR account.
  * The relying party issues a short-lived challenge naming itself as `audience`; the agent's backend
- * asks the API to sign it (`api.sign`); the relying party verifies the NEP-413 signature and that
- * the key controls the account.
+ * asks the API to sign it (`api.nativeNearSignMessage`); the relying party verifies the NEP-413
+ * signature and that the key controls the account.
  *
  * The API signs nothing else: only this exact envelope, never a transaction, an intent or free
  * text, and never for the NEAR Intents contracts. The owner turns signing on per account with the
- * policy rule `sign: { recipients }`.
+ * policy's `native.near.sign_message` list.
  */
 
 /** The NEAR Intents contracts. The API never signs for them, whatever the policy says. */
@@ -106,7 +106,7 @@ async function keyControlsAccount(accountId: string, publicKey: PublicKey, rpcUr
 }
 
 /**
- * Relying party: checks a signature from `api.sign` against the challenge you issued. Throws with
+ * Relying party: checks a signature from `api.nativeNearSignMessage` against the challenge you issued. Throws with
  * the reason when any check fails; returns the proven account otherwise.
  */
 export async function verifyIdentitySignature(input: {

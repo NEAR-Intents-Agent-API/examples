@@ -45,7 +45,7 @@ Each numbered folder has its own README and numbered scripts. Every file starts 
 | [`04-grants`](04-grants/README.md) | Delegated access: issue, use, revoke | Yes |
 | [`05-money-moves`](05-money-moves/README.md) | Swap, transfer, withdraw, deposit, private balance, approvals | Yes |
 | [`06-policy-and-lifecycle`](06-policy-and-lifecycle/README.md) | Edit rules, schedule hours, freeze, archive, delete | Yes |
-| [`07-identity-signing`](07-identity-signing/README.md) | Agent proves its NEAR account to a service (NEP-413) | Some |
+| [`07-native-accounts`](07-native-accounts/README.md) | Agent's own NEAR, EVM and Solana keys: identity proofs, typed data | Some |
 | [`08-errors-and-recovery`](08-errors-and-recovery/README.md) | Error codes, statuses, idempotency, recovery | Some |
 | [`09-raw-http`](09-raw-http/README.md) | The same API with plain `fetch` and curl | Some |
 | [`10-recipes`](10-recipes/README.md) | BFF, timelocks, AI assistants, full journey | Yes |
@@ -68,8 +68,9 @@ key; the owner signs once to create the agent and once to issue each grant. The 
 inside NEAR Intents (public or confidential) under all controls at once: the grant (who may act,
 until when), the policy (`actions`, `assets`, `limits`, `destinations`, owner approval, freeze),
 the USD `budget`, the `timelock_ms` execution delay and the owner's `schedule` of hours. None
-overrides another. The optional `sign` rule lets the agent prove its account to services the
-owner lists; it is off by default and never covers the NEAR Intents contracts.
+overrides another. The optional `native` block switches on the agent's own NEAR, EVM and Solana
+keys outside NEAR Intents, one method at a time; it is off by default, no money rule applies to
+it, and it never covers the NEAR Intents contracts.
 
 ## SDK or HTTP
 
@@ -104,6 +105,7 @@ use `@simplewebauthn/browser` in your frontend.
 | `raw-http.ts` | Plain `fetch` transport |
 | `destinations.ts`, `grant-store.ts`, `format.ts` | Typed destinations, example-only grant cache, atomic ↔ decimal conversion |
 | `identity.ts` | Identity challenges and NEP-413 verification (the relying party's side) |
+| `native.ts` | The `native` policy block: `nativeOff`, `allOff`, the example EIP-712 domain |
 
 ## Related
 
