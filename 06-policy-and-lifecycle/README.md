@@ -70,4 +70,4 @@ Deletion previews the exact assets that would be lost (`public`, `confidential`,
 `assets_lost`). The owner empties the wallet first; the beneficiary receives only the account's
 native NEAR. See `03-archive-and-delete.ts`.
 
-Next: [07 · Identity signing](../07-identity-signing/README.md).
+Next: [07 · Native accounts](../07-native-accounts/README.md).

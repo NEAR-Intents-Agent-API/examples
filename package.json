@@ -30,10 +30,11 @@
     "06:freeze": "tsx --env-file-if-exists=.env 06-policy-and-lifecycle/02-freeze-and-unfreeze.ts",
     "06:archive-and-delete": "tsx --env-file-if-exists=.env 06-policy-and-lifecycle/03-archive-and-delete.ts",
     "06:schedule": "tsx --env-file-if-exists=.env 06-policy-and-lifecycle/04-schedule.ts",
-    "07:enable-signing": "tsx --env-file-if-exists=.env 07-identity-signing/01-enable-signing.ts",
-    "07:sign-and-verify": "tsx --env-file-if-exists=.env 07-identity-signing/02-sign-and-verify.ts",
-    "07:refusals": "tsx --env-file-if-exists=.env 07-identity-signing/03-refusals.ts",
-    "07:disable-signing": "tsx --env-file-if-exists=.env 07-identity-signing/04-disable-signing.ts",
+    "07:enable-native": "tsx --env-file-if-exists=.env 07-native-accounts/01-enable-native.ts",
+    "07:sign-and-verify": "tsx --env-file-if-exists=.env 07-native-accounts/02-sign-and-verify.ts",
+    "07:evm-typed-data": "tsx --env-file-if-exists=.env 07-native-accounts/03-evm-typed-data.ts",
+    "07:refusals": "tsx --env-file-if-exists=.env 07-native-accounts/04-refusals.ts",
+    "07:disable-native": "tsx --env-file-if-exists=.env 07-native-accounts/05-disable-native.ts",
     "08:error-taxonomy": "tsx --env-file-if-exists=.env 08-errors-and-recovery/01-error-taxonomy.ts",
     "08:status-and-uncertain": "tsx --env-file-if-exists=.env 08-errors-and-recovery/02-status-and-uncertain.ts",
     "08:idempotency": "tsx --env-file-if-exists=.env 08-errors-and-recovery/03-idempotency.ts",
@@ -41,7 +42,7 @@
     "09:reads": "tsx --env-file-if-exists=.env 09-raw-http/01-reads.ts",
     "09:owner-flow": "tsx --env-file-if-exists=.env 09-raw-http/02-owner-flow.ts",
     "09:execution": "tsx --env-file-if-exists=.env 09-raw-http/03-execution.ts",
-    "09:sign": "tsx --env-file-if-exists=.env 09-raw-http/04-sign.ts",
+    "09:native": "tsx --env-file-if-exists=.env 09-raw-http/04-native.ts",
     "10:bff-pattern": "tsx --env-file-if-exists=.env 10-recipes/01-bff-pattern.ts",
     "10:timelocked-payout": "tsx --env-file-if-exists=.env 10-recipes/02-timelocked-payout.ts",
     "10:ai-assistant": "tsx --env-file-if-exists=.env 10-recipes/03-ai-assistant.ts",
@@ -50,7 +51,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@near-intents-agent-api/sdk": "^0.5.2",
+    "@near-intents-agent-api/sdk": "^0.5.3",
     "near-api-js": "^7.2.0",
     "viem": "^2.56.8",
     "zod": "^4.6.4"

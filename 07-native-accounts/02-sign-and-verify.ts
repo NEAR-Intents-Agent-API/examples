@@ -5,12 +5,13 @@
  *       sign it with the agent's key under a grant; the relying party verifies the NEP-413
  *       signature and that the key controls the agent's NEAR account.
  * When: an agent logs in to a service that identifies NEAR accounts by signature.
- * Needs: `AGENT_ID`, `AGENT_SIGN_RECIPIENT` listed in the policy (`07:enable-signing`), stored
- *        grant (`04:issue-grant`).
+ * Needs: `AGENT_ID`, `AGENT_SIGN_RECIPIENT` in `native.near.sign_message` (`07:enable-native`),
+ *        stored grant (`04:issue-grant`).
  * Run: `pnpm 07:sign-and-verify`
  *
- * Signing moves no money and changes no state, so it needs no `AGENT_ALLOW_WRITES`. It does need a
- * live grant: the API key alone is refused with `agent_grant_required`. Each call returns a fresh
+ * Signing moves no money, so it needs no `AGENT_ALLOW_WRITES`; each signature is recorded in the
+ * agent's history as type `native`. It does need a live grant: the API key alone is refused with
+ * `agent_grant_required`. Each call returns a fresh
  * random NEP-413 nonce; the relying party accepts each `challenge` value once and only before
  * `expires_at_ms` (at most 5 minutes after `issued_at_ms`).
  */
@@ -27,7 +28,10 @@ export function signChallenge(
   input: { message: string; recipient: string },
 ) {
   // `encoding: "hex"` is also accepted when your transport cannot carry the JSON as text.
-  return delegate.sign(agentId, { message: input.message, recipient: input.recipient });
+  return delegate.nativeNearSignMessage(agentId, {
+    message: input.message,
+    recipient: input.recipient,
+  });
 }
 
 export async function signAndVerify(agentId: string, recipient: string) {
