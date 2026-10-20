@@ -44,7 +44,8 @@ export async function signAndVerify(agentId: string, recipient: string) {
     nonce: issued.nonce,
   });
 
-  // 3. Relying party: verify the signature, the nonce, the key and the account. Mark the nonce used.
+  // 3. Relying party: verify the signature, the nonce, the key and the account. verifyLogin does not
+  //    remember nonces: a real relying party records each nonce as used to refuse replays.
   const { near_account_id } = await api.getWallet(agentId);
   const proven = await verifyLogin({
     issued,
