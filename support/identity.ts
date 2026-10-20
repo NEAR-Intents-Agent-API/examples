@@ -3,64 +3,38 @@ import type { Signature } from "@near-intents-agent-api/sdk";
 import { JsonRpcProvider, PublicKey } from "near-api-js";
 
 /**
- * Identity signing, from both sides.
+ * NEP-413 login, from both sides.
  *
- * The agent proves to another service (the *relying party*) that it controls its NEAR account.
- * The relying party issues a short-lived challenge naming itself as `audience`; the agent's backend
- * asks the API to sign it (`api.nativeNearSignMessage`); the relying party verifies the NEP-413
- * signature and that the key controls the account.
+ * A service (the *relying party*) issues a login `message` and a random 32-byte `nonce`, naming
+ * itself as `recipient` (its NEAR account or domain). The agent's backend asks the API to sign
+ * exactly those (`api.nativeNearSignMessage`); the service verifies the NEP-413 signature, that
+ * the nonce is the one it issued, and that the key controls the account.
  *
- * The API signs nothing else: only this exact envelope, never a transaction, an intent or free
- * text, and never for the NEAR Intents contracts. The owner turns signing on per account with the
- * policy's `native.near.sign_message` list.
+ * The API signs only the NEP-413 payload, never a transaction or an intent, and never for the
+ * NEAR Intents contracts. The owner turns signing on per recipient with the policy's
+ * `native.near.sign_message` list.
  */
 
 /** The NEAR Intents contracts. The API never signs for them, whatever the policy says. */
 export const intentsContracts = ["intents.near", "intents.far"] as const;
 
 export function isIntentsContract(account: string) {
-  return (intentsContracts as readonly string[]).includes(account);
-}
-
-/** The only message the API signs. Every field is required and no other field is accepted. */
-export type IdentityChallenge = {
-  domain: "near-intents-agent-api.identity.v1";
-  purpose: "identity";
-  chain: "near";
-  /** The relying party's NEAR account; also the NEP-413 `recipient`. */
-  audience: string;
-  /** 32 random bytes, hex. The relying party accepts each one once. */
-  challenge: string;
-  issued_at_ms: number;
-  /** At most 5 minutes after `issued_at_ms`. */
-  expires_at_ms: number;
-};
-
-/** Canonical JSON: keys sorted, no whitespace. The API refuses any other spelling. */
-export function canonicalJson(value: Record<string, string | number>) {
-  return JSON.stringify(
-    Object.fromEntries(Object.entries(value).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))),
-  );
+  return (intentsContracts as readonly string[]).includes(account.toLowerCase());
 }
 
 /**
- * Relying party: a fresh challenge for `audience` (your service's NEAR account). Store
- * `challenge.challenge` until it expires and accept it once.
+ * Relying party: a login request for `recipient` (your service's NEAR account or domain). Keep
+ * `nonce` until the login completes and accept it once.
  */
-export function identityChallenge(audience: string, lifetimeMs = 60_000) {
-  if (isIntentsContract(audience))
-    throw new Error(`${audience} is a NEAR Intents contract; the API never signs for it`);
-  const issuedAtMs = Date.now();
-  const challenge: IdentityChallenge = {
-    domain: "near-intents-agent-api.identity.v1",
-    purpose: "identity",
-    chain: "near",
-    audience,
-    challenge: randomBytes(32).toString("hex"),
-    issued_at_ms: issuedAtMs,
-    expires_at_ms: issuedAtMs + lifetimeMs,
+export function loginRequest(recipient: string) {
+  if (isIntentsContract(recipient))
+    throw new Error(`${recipient} is a NEAR Intents contract; the API never signs for it`);
+  const nonce = randomBytes(32).toString("base64");
+  return {
+    recipient,
+    nonce,
+    message: `Log in to ${recipient} at ${new Date().toISOString()}`,
   };
-  return { challenge, message: canonicalJson(challenge) };
 }
 
 function borshString(value: string) {
@@ -106,30 +80,29 @@ async function keyControlsAccount(accountId: string, publicKey: PublicKey, rpcUr
 }
 
 /**
- * Relying party: checks a signature from `api.nativeNearSignMessage` against the challenge you issued. Throws with
- * the reason when any check fails; returns the proven account otherwise.
+ * Relying party: checks a signature from `api.nativeNearSignMessage` against the login request you
+ * issued. Throws with the reason when any check fails; returns the proven account otherwise.
  */
-export async function verifyIdentitySignature(input: {
-  issued: { challenge: IdentityChallenge; message: string };
+export async function verifyLogin(input: {
+  issued: ReturnType<typeof loginRequest>;
   signature: Signature;
   rpcUrl: string;
   /** The account you expect, when you already know it. */
   expectedAccountId?: string;
 }) {
   const { issued, signature } = input;
-  if (signature.recipient !== issued.challenge.audience)
-    throw new Error("signature is for another recipient");
-  if (Date.now() >= issued.challenge.expires_at_ms) throw new Error("challenge expired");
+  if (signature.recipient !== issued.recipient) throw new Error("signature is for another recipient");
+  if (signature.nonce !== issued.nonce) throw new Error("signature answers another nonce");
   if (input.expectedAccountId && signature.near_account_id !== input.expectedAccountId)
     throw new Error("signature is from another account");
 
   const publicKey = PublicKey.fromString(signature.public_key);
   const digest = nep413Digest({
     message: issued.message,
-    nonce: Buffer.from(signature.nonce, "base64"),
-    recipient: signature.recipient,
+    nonce: Buffer.from(issued.nonce, "base64"),
+    recipient: issued.recipient,
   });
-  if (!publicKey.verify(digest, Buffer.from(signature.signature, "hex")))
+  if (!publicKey.verify(digest, Buffer.from(signature.signature, "base64")))
     throw new Error("signature does not verify");
   if (!(await keyControlsAccount(signature.near_account_id, publicKey, input.rpcUrl)))
     throw new Error("public key does not control the account");

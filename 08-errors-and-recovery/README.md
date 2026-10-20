@@ -32,7 +32,7 @@ per field in `errors`.
 | Deposit quota | `deposit_quota_exceeded` | Back off until `availableAt` |
 | Throttled | `policy_change_throttled`, `agent_unfreeze_throttled` | Back off until `availableAt` |
 | Stale policy revision | `policy_revision_conflict` | Read again, generate fresh |
-| Native refused | `signing_recipient_forbidden`, `signing_policy_denied`, `signing_identity_challenge_invalid`, `native_method_denied`, `native_contract_forbidden` | See [07 · Native accounts](../07-native-accounts/README.md#refusals) |
+| Native refused | `signing_recipient_forbidden`, `signing_policy_denied`, `native_method_denied`, `native_contract_forbidden` | See [07 · Native accounts](../07-native-accounts/README.md#refusals) |
 
 ## The status machine
 

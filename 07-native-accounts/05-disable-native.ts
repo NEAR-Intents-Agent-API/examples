@@ -1,5 +1,5 @@
 /**
- * Turn native methods off, for one identity service or entirely.
+ * Turn native methods off, for one signing recipient or entirely.
  *
  * What: removes `AGENT_SIGN_RECIPIENT` from `native.near.sign_message`. When nothing is left
  *       switched on, or when run with `all`, it omits `native` from the policy, so every native
@@ -11,9 +11,9 @@
  *
  * "All off" is spelled by omitting `native`. The change is on-chain like enabling it, and takes
  * effect once `/policy` is `APPLIED` and synced: the next request is then refused with
- * `signing_policy_denied` (identity) or `native_method_denied` (any other method). Signatures
- * already issued stay valid for whoever holds them: an identity challenge expires within 5
- * minutes, but signed typed data or a signed transaction may stay usable until its own deadline.
+ * `signing_policy_denied` (NEP-413 signing) or `native_method_denied` (any other method). Signatures
+ * already issued stay valid for whoever holds them: a login signature stays valid for as long as
+ * the service accepts its nonce, and signed typed data or a signed transaction may stay usable until its own deadline.
  *
  * Revoking a grant also stops that grant from using native methods, without touching the policy.
  */
@@ -78,7 +78,7 @@ if (isMainModule(import.meta.url)) {
   banner([
     recipient === null
       ? "Turning every native method off…"
-      : `Removing ${recipient} from the identity services…`,
+      : `Removing ${recipient} from the signing recipients…`,
   ]);
   void disableNative(required(settings.agentId, "AGENT_ID"), recipient).then(print);
 }

@@ -51,7 +51,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@near-intents-agent-api/sdk": "^0.5.3",
+    "@near-intents-agent-api/sdk": "^0.6.0",
     "near-api-js": "^7.2.0",
     "viem": "^2.56.8",
     "zod": "^4.6.4"
