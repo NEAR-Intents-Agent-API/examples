@@ -45,7 +45,7 @@ Each numbered folder has its own README and numbered scripts. Every file starts 
 | [`04-grants`](04-grants/README.md) | Delegated access: issue, use, revoke | Yes |
 | [`05-money-moves`](05-money-moves/README.md) | Swap, transfer, withdraw, deposit, private balance, approvals | Yes |
 | [`06-policy-and-lifecycle`](06-policy-and-lifecycle/README.md) | Edit rules, schedule hours, freeze, archive, delete | Yes |
-| [`07-native-accounts`](07-native-accounts/README.md) | Agent's own NEAR, EVM and Solana keys: identity proofs, typed data | Some |
+| [`07-native-accounts`](07-native-accounts/README.md) | Agent's own NEAR, EVM and Solana keys: NEP-413 logins, typed data | Some |
 | [`08-errors-and-recovery`](08-errors-and-recovery/README.md) | Error codes, statuses, idempotency, recovery | Some |
 | [`09-raw-http`](09-raw-http/README.md) | The same API with plain `fetch` and curl | Some |
 | [`10-recipes`](10-recipes/README.md) | BFF, timelocks, AI assistants, full journey | Yes |
@@ -104,7 +104,7 @@ use `@simplewebauthn/browser` in your frontend.
 | `evm-owner.ts` | EVM owner: `viem`, EIP-712 |
 | `raw-http.ts` | Plain `fetch` transport |
 | `destinations.ts`, `grant-store.ts`, `format.ts` | Typed destinations, example-only grant cache, atomic ↔ decimal conversion |
-| `identity.ts` | Identity challenges and NEP-413 verification (the relying party's side) |
+| `identity.ts` | NEP-413 login requests and verification (the relying party's side) |
 | `native.ts` | The `native` policy block: `nativeOff`, `allOff`, the example EIP-712 domain |
 
 ## Related

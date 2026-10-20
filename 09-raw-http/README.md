@@ -9,7 +9,7 @@ on writes, `X-Grant-Token` on delegated calls, JSON bodies, JSON:API errors. Eve
 | `01-reads.ts` | `pnpm 09:reads` | Network, tokens, agent, policy — plain `fetch` |
 | `02-owner-flow.ts` | `pnpm 09:owner-flow` | generate → sign → submit → status over raw HTTP |
 | `03-execution.ts` | `pnpm 09:execution` | A delegated action with grant and idempotency headers |
-| `04-native.ts` | `pnpm 09:native` | Native identity signing with `X-Grant-Token`, then verifying the signature |
+| `04-native.ts` | `pnpm 09:native` | NEP-413 message signing with `X-Grant-Token`, then verifying the signature |
 
 ## curl cheatsheet
 
@@ -43,10 +43,10 @@ curl "$API/v1/agents/$AGENT_ID/transfer" \
   -H "Idempotency-Key: payout-42" -H "Content-Type: application/json" \
   -d '{"asset":"nep141:wrap.near","amount":"1","recipient":"bob.near"}'
 
-# Native identity signing: grant token, no idempotency key. `message` is the canonical challenge JSON.
+# Native NEP-413 signing: grant token, no idempotency key. `nonce` is 32 random bytes, base64.
 curl "$API/v1/agents/$AGENT_ID/native/near/sign-message" \
   -H "X-API-Key: $KEY" -H "X-Grant-Token: $GRANT_TOKEN" -H "Content-Type: application/json" \
-  -d '{"recipient":"login.example.near","message":"{\"audience\":\"login.example.near\",\"chain\":\"near\",\"challenge\":\"<64 hex>\",\"domain\":\"near-intents-agent-api.identity.v1\",\"expires_at_ms\":<ms>,\"issued_at_ms\":<ms>,\"purpose\":\"identity\"}"}'
+  -d '{"recipient":"app.example.com","message":"Log in to app.example.com","nonce":"<32 bytes, base64>"}'
 ```
 
 ## Parity with the SDK

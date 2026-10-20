@@ -1,12 +1,12 @@
 /**
- * Turn on native methods: identity signing for one service, and EVM typed data for one domain.
+ * Turn on native methods: NEP-413 signing for one recipient, and EVM typed data for one domain.
  *
  * What: adds `AGENT_SIGN_RECIPIENT` to `native.near.sign_message`, and with `evm` also lists the
  *       example EIP-712 domain in `native.evm.sign_typed_data`. Every other switch keeps its value.
  * When: a service the owner trusts logs agents in by NEAR account (NEP-413), or an app the agent
  *       uses asks for EIP-712 signatures under one known domain.
  * Needs: `AGENT_ALLOW_WRITES=true`, owner keys, `AGENT_ID`, `AGENT_SIGN_RECIPIENT`.
- * Run: `pnpm 07:enable-native` (identity only) or `pnpm 07:enable-native evm` (also the domain)
+ * Run: `pnpm 07:enable-native` (NEP-413 only) or `pnpm 07:enable-native evm` (also the domain)
  *
  * Native methods are off until the owner adds the `native` block. The wallet provider enforces it,
  * so this is an on-chain policy change (`nep366`, gas sponsored by the API). None of the money
@@ -81,7 +81,7 @@ if (isMainModule(import.meta.url)) {
   const recipient = required(settings.signRecipient, "AGENT_SIGN_RECIPIENT");
   const evm = process.argv[2] === "evm";
   banner([
-    `Letting the agent sign identity challenges for ${recipient}${evm ? ` and EIP-712 data for "${exampleDomain.name}"` : ""}…`,
+    `Letting the agent sign NEP-413 messages for ${recipient}${evm ? ` and EIP-712 data for "${exampleDomain.name}"` : ""}…`,
   ]);
   void enableNative(required(settings.agentId, "AGENT_ID"), recipient, evm).then(print);
 }

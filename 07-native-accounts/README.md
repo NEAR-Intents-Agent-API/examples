@@ -3,18 +3,18 @@
 Every agent wallet also has its own keys outside NEAR Intents: its NEAR account
 (`wallet.near_account_id`), one EVM address for every EVM chain (`wallet.evm_account_id`) and a
 Solana address (`wallet.solana_account_id`). The owner switches them on one method at a time in the
-policy's `native` block. These examples cover the two most common uses: proving the agent's NEAR
-account to a service (NEP-413), and signing EIP-712 typed data for an app under one listed domain.
+policy's `native` block. These examples cover the two most common uses: signing NEP-413 messages (site logins) with the
+agent's NEAR key, and signing EIP-712 typed data for an app under one listed domain.
 
 | Example | Run | What it shows |
 |---|---|---|
 | `01-enable-native.ts` | `pnpm 07:enable-native [evm]` | Owner lists a service in `near.sign_message` (and with `evm` a typed-data domain), with the warning to show |
-| `02-sign-and-verify.ts` | `pnpm 07:sign-and-verify` | Both sides: issue a challenge, sign it under a grant, verify it |
+| `02-sign-and-verify.ts` | `pnpm 07:sign-and-verify` | Both sides: issue a login request, sign it under a grant, verify it |
 | `03-evm-typed-data.ts` | `pnpm 07:evm-typed-data` | Sign typed data under the listed domain, recover the signer; another domain is refused |
 | `04-refusals.ts` | `pnpm 07:refusals` | Every refusal code, including `intents.near`/`intents.far` |
 | `05-disable-native.ts` | `pnpm 07:disable-native [all]` | Remove one service, or omit `native` to turn everything off |
 
-Set `AGENT_SIGN_RECIPIENT` in `.env` to the NEAR account of the service the agent logs in to.
+Set `AGENT_SIGN_RECIPIENT` in `.env` to the NEAR account or domain of the service the agent logs in to.
 
 ## Off until the owner turns it on
 
@@ -68,24 +68,27 @@ domain's fields in EIP-712 order. List domains as narrowly as the app allows: Hy
 `intents.near` and `intents.far` can never be listed. A policy listing them is refused with
 `validation_failed`, a sign request naming them with `403 signing_recipient_forbidden`, and a
 native transfer or call to them with `403 native_contract_forbidden`, before the policy is read.
-The identity challenge also could not parse as an intent: it has exactly the seven envelope fields
-below and no `signer_id`, `deadline` or `intents`.
+The NEP-413 payload cannot parse as an intent either: it is a message, a recipient and a nonce
+under a fixed tag, with no `signer_id`, `deadline` or `intents`.
 
-## The identity challenge
+## The login request
 
-```json
-{"audience":"login.example.near","chain":"near","challenge":"<64 hex>","domain":"near-intents-agent-api.identity.v1","expires_at_ms":1760000060000,"issued_at_ms":1760000000000,"purpose":"identity"}
-```
+The relying party (the service the agent logs in to) issues three things; the agent's backend sends
+them unchanged:
 
-- Canonical JSON: keys sorted, no whitespace. Any other spelling is
-  `signing_identity_challenge_invalid`.
-- `audience` equals the request's `recipient`.
-- At most 5 minutes from `issued_at_ms` to `expires_at_ms`, not expired, not issued in the future.
-- The relying party generates `challenge` (32 random bytes) and accepts each one once.
+| Field | Meaning |
+|---|---|
+| `message` | What the service asks the agent to sign (UTF-8, or `encoding: "hex"` for raw bytes) |
+| `recipient` | The service's NEAR account or domain; must be listed in `native.near.sign_message` |
+| `nonce` | 32 random bytes, base64 (44 characters); the service accepts each once |
 
-`support/identity.ts` builds challenges (`identityChallenge`) and verifies signatures
-(`verifyIdentitySignature`): the NEP-413 digest, the ed25519 signature, and that the key is a
-full-access key of the account on chain (or the key an implicit account is derived from).
+The response carries `near_account_id`, `public_key`, the base64 `signature` and the echoed
+`nonce` and `recipient`. `callbackUrl` is not supported. The API verifies the signature against the
+NEP-413 payload before returning it.
+
+`support/identity.ts` builds login requests (`loginRequest`) and verifies signatures (`verifyLogin`):
+the NEP-413 digest, the ed25519 signature, the nonce, and that the key is a full-access key of the
+account on chain (or the key an implicit account is derived from).
 
 ## Refusals
 
@@ -93,7 +96,7 @@ full-access key of the account on chain (or the key an implicit account is deriv
 |---|---|---|
 | `signing_recipient_forbidden` | 403 | `intents.near`/`intents.far` as recipient, whatever the policy says |
 | `native_contract_forbidden` | 403 | A native transfer to or call of `intents.near`/`intents.far` |
-| `signing_identity_challenge_invalid` | 400 | Not the canonical, current challenge for this recipient |
+| `validation_failed` | 400 | Malformed body, e.g. a nonce that is not 32 bytes of base64 |
 | `policy_not_ready` | 409 | The latest policy revision is not applied and synced yet |
 | `wallet_frozen` | 409 | The owner froze the account |
 | `agent_grant_required` | 403 | No live `X-Grant-Token` |
