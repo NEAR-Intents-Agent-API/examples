@@ -32,7 +32,8 @@ export async function updateLocalPolicy(agentId: string) {
   // 1. Read the current revision, then send the complete policy with the edit applied.
   const request = await buildPolicyUpdate(api, agentId, (policy) => ({
     ...policy,
-    // All three windows must be present. null means uncapped; "0" allows no counted spend.
+    // All three caps must be present. null turns a cap off (nothing counted for it); "0" allows no
+    // counted spend. Turning a cap off and on again starts a fresh period.
     // A supplied budget replaces all three caps, so send the ones you want to keep.
     budget: { daily_usd: "50", weekly_usd: "250", monthly_usd: null },
     // Every money action waits this long (milliseconds) before dispatch. 0 disables the delay.

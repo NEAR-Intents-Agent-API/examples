@@ -1,7 +1,8 @@
 /**
  * Update an agent's policy with an EVM owner.
  *
- * What: raises the per-transaction cap and the USD budget from an EVM wallet (EIP-712).
+ * What: sets the per-transaction cap and the USD budget (daily 100, weekly 500, monthly off) from an
+ * EVM wallet (EIP-712).
  * When: after `03:evm-create-agent`, or for any agent owned by an EVM address.
  * Needs: `AGENT_ALLOW_WRITES=true`, `AGENT_OWNER_EVM_PRIVATE_KEY`, `AGENT_ID`.
  * Run: `pnpm 03:evm-policy-update`
