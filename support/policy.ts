@@ -23,7 +23,8 @@ import { intentsAccount } from "./destinations.js";
  *   units.
  * - `max_actions_per_hour`: a cap on money actions per hour, or `null` for none.
  * - `destinations`: `{ mode: "any" | "only" | "except", list }`.
- * - `budget`: USD caps over rolling day, week and month windows across every asset, or `null`.
+ * - `budget`: USD caps per day, week and month across every asset, or `null`; each period starts
+ *   when that cap is turned on.
  * - `timelock_ms`: how long every delegated action waits before it runs (0 to 30 days).
  * - `schedule`: optional weekly windows on the owner's clock when money actions may run (`only`)
  *   or are paused (`except`). Omitted means any time.
@@ -62,7 +63,8 @@ export function transferPolicy(input: {
  * A broad policy that allows every flow NEAR Intents offers, capped per token and in USD. This is
  * the shape an owner picks when the agent should be genuinely useful, with a hard ceiling.
  *
- * `budget` windows are rolling and enforced by the API in one ledger shared by every grant.
+ * `budget` caps reset in full at the end of each period and are enforced by the API in one ledger
+ * shared by every grant.
  * `null` leaves a window uncapped. `budget`, `timelock_ms` and `schedule` are enforced by the API itself, so
  * changing only them needs one signature but no blockchain transaction.
  */
