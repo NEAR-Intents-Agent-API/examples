@@ -65,7 +65,7 @@ export function transferPolicy(input: {
  *
  * `budget` caps reset in full at the end of each period and are enforced by the API in one ledger
  * shared by every grant.
- * `null` leaves a window uncapped. `budget`, `timelock_ms` and `schedule` are enforced by the API itself, so
+ * `null` leaves that cap off. `budget`, `timelock_ms` and `schedule` are enforced by the API itself, so
  * changing only them needs one signature but no blockchain transaction.
  */
 export function fullAccessPolicy(input: {

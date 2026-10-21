@@ -21,7 +21,7 @@ per field in `errors`.
 | Policy turns the action off | `policy_action_denied` | Owner enables it in the policy; no new grant |
 | Destination outside the account rule | `policy_destination_denied` | Owner adds it to `policy.destinations`; no new grant |
 | Provider policy refuses | `policy_denied` | Change the policy (owner) |
-| USD budget exhausted | `spend_budget_exceeded` | Wait for the window or raise the cap |
+| USD budget exhausted | `spend_budget_exceeded` | Wait until that cap's `usage.budget.<window>.resets_at` (its period ends and the whole cap is back), or the owner raises it; retry with a new key |
 | Per-asset limit or hourly action cap used up (shield and unshield count too) | `policy_limit_exceeded`, `policy_action_limit_exceeded` | Wait for the window or the owner raises it; retry with a new key |
 | Earlier actions the API cannot count against a limit | `policy_usage_unavailable` | Nothing was sent; wait until they leave the window |
 | Outside the owner's schedule | `policy_schedule_denied` | Submit again at `availableAt` with a new key, or owner changes `schedule` |

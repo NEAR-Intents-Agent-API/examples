@@ -9,7 +9,7 @@
  *
  * Creating an address needs only the API key and an idempotency key. No grant signature,
  * destination rule, budget charge or execution delay applies. Each new key creates a new address
- * (500 per tenant per rolling 24 hours); the same key returns the same one, so keep it for
+ * (100 per agent per rolling 24 hours); the same key returns the same one, so keep it for
  * retries. The status stays `PENDING_DEPOSIT` until the deposit arrives.
  *
  * `origin_asset` names the token and chain the payer sends from. `amount` is optional: without it
