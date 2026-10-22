@@ -50,6 +50,10 @@ native: {
   that EVM or Solana address.
 - **Signing never broadcasts.** The signing routes return the signature; the caller hands it to
   the app or sends the transaction. Every request is recorded in history as type `native`.
+- **Only transactions are signed as transactions.** `evm/sign-transaction` takes one serialized
+  unsigned EIP-2718 typed or EIP-155 legacy transaction whose chain id is `chain`'s;
+  `solana/sign-transaction` takes one legacy or v0 transaction message. Anything else is
+  `validation_failed`, so neither route signs an arbitrary message.
 
 Show the owner a warning before they sign a policy that turns on native methods; `01` exports
 `nativeWarning` as an example. The signed policy preview also lists every switch that is on.
