@@ -8,7 +8,8 @@
  * Run: `pnpm 05:quote-and-swap`
  *
  * Always quote first: `dry: true` returns expected output and fees with no authority and no
- * idempotency key. Set `min_amount_out` on the live request to refuse a worse fill.
+ * idempotency key. Set `min_amount_out` on the live request to send the provider a minimum output;
+ * the quote does not apply it, and a swap reported below it reads `NEEDS_REVIEW`, never `SUCCESS`.
  */
 import { agentApi } from "../support/client.js";
 import { banner, config, isMainModule, print, required, requireWrites } from "../support/config.js";
