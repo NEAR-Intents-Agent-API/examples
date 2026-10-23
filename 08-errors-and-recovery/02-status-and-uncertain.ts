@@ -51,7 +51,8 @@ export async function observe(correlationId: string) {
     classification,
     guidance: {
       poll: "Not settled yet. Poll the same correlation_id (waitMs ≤ 30 000).",
-      settled: "Terminal with evidence. No retry needed; read details for hashes.",
+      settled:
+        "Terminal with evidence. No retry needed; read details for hashes. details.amount_out is final and appears only on SUCCESS (or REFUNDED after a partial fill); before that read details.expected_amount_out.",
       "waiting-external": "Waiting on a human or external funds. Do not resubmit.",
       reconcile:
         "Outcome unknown. Observe the original correlation_id; never resubmit with a new key. Recover only with proof the provider was never reached.",

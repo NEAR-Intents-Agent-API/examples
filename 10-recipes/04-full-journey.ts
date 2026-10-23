@@ -128,8 +128,12 @@ export async function fullJourney() {
     balances: balances.balances.map((entry) => ({
       asset_id: entry.asset_id,
       balance_raw: entry.balance_raw,
+      // What the agent can spend now, as the API computes it.
+      available_raw: entry.available_raw,
     })),
     quote: quote.quote,
+    // Rules or balance a live swap would fail are listed here; a dry swap never refuses for them.
+    quote_warnings: quote.warnings,
     swap: swap
       ? { correlation_id: swap.correlation_id, status: swap.status }
       : "skipped (AGENT_EXECUTE=false)",

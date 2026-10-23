@@ -51,9 +51,13 @@ export async function inspectAgent(agentId: string) {
     list.map((entry) => ({
       asset_id: entry.asset_id,
       symbol: entry.symbol,
-      // Use balance_raw for arithmetic; balance is exact but for display.
+      // balance_raw is what the account holds. available_raw is what it can spend now: the
+      // balance minus queued or timelocked work not yet dispatched (dispatched work is already
+      // debited). Use the *_raw atomic values for arithmetic; balance/available are for display.
       balance_raw: entry.balance_raw,
       balance: entry.balance ?? (entry.decimals === null ? null : undefined),
+      available_raw: entry.available_raw,
+      available: entry.available ?? (entry.decimals === null ? null : undefined),
       usd_price: entry.price,
     }));
   return {

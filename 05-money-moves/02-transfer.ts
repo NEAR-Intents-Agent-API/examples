@@ -37,7 +37,8 @@ export async function transfer(agentId: string) {
     correlation_id: status.correlation_id,
     status: status.status,
     failure_code: status.failure_code,
-    // A refusal names the blocking layer: grant, policy or budget.
+    // A refusal throws an AgentApiError instead: `layer` names who refused (grant, policy, budget,
+    // balance, ...), and a budget or limit refusal creates no operation and no FAILED status.
     details: status.details,
   };
 }

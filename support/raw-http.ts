@@ -5,7 +5,8 @@ import { config, required } from "./config.js";
  *
  * Every endpoint is ordinary HTTP: `X-API-Key` on every request, `Idempotency-Key` on writes
  * that create work, `X-Grant-Token` on delegated calls. Errors are JSON:API documents; branch on
- * `errors[0].code`.
+ * `errors[0].code` and read `errors[0].layer` (`request`, `auth`, `grant`, `policy`, `budget`,
+ * `balance`, `provider` or `api`) to know whose rule refused.
  */
 export type RawRequest = {
   method?: "GET" | "POST" | "DELETE";
@@ -22,6 +23,8 @@ export class RawApiError extends Error {
     public readonly status: number,
     public readonly code: string,
     public readonly document: unknown,
+    /** Which layer refused; absent when the body was not an API error document. */
+    public readonly layer?: string,
   ) {
     super(`HTTP ${status}: ${code}`);
     this.name = "RawApiError";
@@ -56,6 +59,14 @@ function errorCode(value: unknown, status: number): string {
   return `http_${status}`;
 }
 
+function errorLayer(value: unknown): string | undefined {
+  if (value && typeof value === "object" && "errors" in value) {
+    const layer = (value as { errors?: Array<{ layer?: unknown }> }).errors?.[0]?.layer;
+    return typeof layer === "string" ? layer : undefined;
+  }
+  return undefined;
+}
+
 /** Sends one `/v1` request and returns the parsed JSON body. */
 export async function rawRequest<T>(request: RawRequest): Promise<T> {
   const { apiUrl } = config();
@@ -70,6 +81,6 @@ export async function rawRequest<T>(request: RawRequest): Promise<T> {
   });
   const value = parseBody(await response.text());
   if (!response.ok)
-    throw new RawApiError(response.status, errorCode(value, response.status), value);
+    throw new RawApiError(response.status, errorCode(value, response.status), value, errorLayer(value));
   return value as T;
 }

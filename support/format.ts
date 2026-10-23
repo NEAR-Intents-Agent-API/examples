@@ -1,6 +1,7 @@
 /**
  * Display helpers. Amounts are always atomic integer strings on the wire; convert only for
- * humans, and only for display. Use `balance_raw` (atomic) for arithmetic and request bodies.
+ * humans, and only for display. Use `balance_raw` / `available_raw` (atomic) for arithmetic and
+ * request bodies: `available_raw` is what the agent can spend now.
  */
 
 /** Converts atomic units to a whole-token decimal string, exactly, without floating point. */

@@ -8,6 +8,9 @@
  *        `confidential: true`.
  * Run: `pnpm 05:private-balance`
  *
+ * `available_raw` is what each balance can spend now (the balance minus queued or timelocked work
+ * not yet dispatched); it is the API's figure, so do not subtract pending work yourself.
+ *
  * Confidential operations never silently fall back to public settlement. Shield and unshield
  * move value between the agent's own balances and name no recipient, so the policy's
  * `destinations` rule does not apply to them; `confidential: true` is what allows them.
@@ -26,10 +29,12 @@ async function balances(api: ReturnType<typeof agentApi>, agentId: string) {
     public: publicBalances.balances.map((entry) => ({
       asset_id: entry.asset_id,
       balance_raw: entry.balance_raw,
+      available_raw: entry.available_raw,
     })),
     confidential: confidentialBalances.balances.map((entry) => ({
       asset_id: entry.asset_id,
       balance_raw: entry.balance_raw,
+      available_raw: entry.available_raw,
     })),
   };
 }

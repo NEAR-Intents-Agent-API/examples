@@ -10,6 +10,13 @@
  * Always quote first: `dry: true` returns expected output and fees with no authority and no
  * idempotency key. Set `min_amount_out` on the live request to send the provider a minimum output;
  * the quote does not apply it, and a swap reported below it reads `NEEDS_REVIEW`, never `SUCCESS`.
+ *
+ * A dry swap never refuses for rules or balance. Each check the live swap would fail comes back in
+ * `warnings` under the live request's code (`policy_action_denied`, `policy_asset_denied`,
+ * `unsupported_token`, `insufficient_balance` with `available_amount`, a budget or limit code, ...),
+ * so read them before executing. In the live status, `details.amount_out` is final and present only
+ * on `SUCCESS` (or `REFUNDED` after a partial fill); until then `details.expected_amount_out` is an
+ * estimate.
  */
 import { agentApi } from "../support/client.js";
 import { banner, config, isMainModule, print, required, requireWrites } from "../support/config.js";
@@ -31,6 +38,7 @@ export async function quoteAndSwap(agentId: string) {
   if (!settings.execute) {
     return {
       quote: quote.quote,
+      warnings: quote.warnings,
       note: "Quote only. Set AGENT_EXECUTE=true to execute this swap.",
     };
   }
