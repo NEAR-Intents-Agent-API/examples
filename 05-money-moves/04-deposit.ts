@@ -15,7 +15,9 @@
  * `origin_asset` names the token and chain the payer sends from. `amount` is optional: without it
  * any payment at or above `details.min_amount` before `details.expires_at` is credited. There is
  * no refund address to choose: a failed or late deposit refunds into the agent's own balance
- * (`details.refund_to`).
+ * (`details.refund_to`). An unpaid deposit ends `FAILED` with `failure_code: "deposit_expired"` one
+ * day after `details.expires_at`; a deposit with a known deposit tx or amount never expires, and a
+ * late payment is refunded to `refund_to`.
  *
  * `shield`/`unshield` move between existing balances; this endpoint brings in new value.
  */

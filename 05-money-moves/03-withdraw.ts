@@ -12,6 +12,13 @@
  * Cross-chain bridges outlive a synchronous request. `async: true` returns as soon as the bridge
  * accepts the request; keep following the correlation id. The recipient, chain and memo must match a
  * policy destination exactly — including the memo (`null` means no memo).
+ *
+ * The preview never refuses for rules or balance: an action or destination the policy does not
+ * allow (`policy_action_denied`, `policy_destination_denied`), an unsupported token, an invalid
+ * address or too little available balance (`insufficient_balance` with `available_amount`) is
+ * listed in `warnings`, so read them before the live withdrawal. A refusal the provider states
+ * before it quotes gives its daily preview attempt back. As with a swap, `details.amount_out` in
+ * the live status is final only on `SUCCESS`; before that read `details.expected_amount_out`.
  */
 import { agentApi } from "../support/client.js";
 import { banner, config, isMainModule, print, required, requireWrites } from "../support/config.js";
@@ -38,6 +45,7 @@ export async function withdraw(agentId: string) {
   if (!settings.execute) {
     return {
       preview: preview.quote,
+      warnings: preview.warnings,
       note: "Dry preview only. Set AGENT_EXECUTE=true to withdraw.",
     };
   }

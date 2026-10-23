@@ -6,13 +6,45 @@
  * Needs: `NEAR_INTENTS_AGENT_API_KEY`, `AGENT_ID`, stored grant (for one of the refusals).
  * Run: `pnpm 08:error-taxonomy`
  *
- * Errors are JSON:API documents. Branch on `error.code`; `retryable`, `availableAt` (from `meta.available_at`) and
- * `requestId` (from `meta.request_id`) guide retries and support. Validation failures return one entry per field.
+ * Errors are JSON:API documents. Branch on `error.code`; `layer` says whose rule refused (`request`,
+ * `auth`, `grant`, `policy`, `budget`, `balance`, `provider` or `api`), so it picks the guidance.
+ * `retryable` (the same Idempotency-Key can succeed), `availableAt` (from `meta.available_at`),
+ * `minAmount`, `availableAmount` and `requestId` (from `meta.request_id`) guide retries and
+ * support. Validation failures return one entry per field.
  */
 import { AgentApiError } from "@near-intents-agent-api/sdk";
 import { agentApi } from "../support/client.js";
 import { banner, config, isMainModule, print, required } from "../support/config.js";
 import { loadGrant } from "../support/grant-store.js";
+
+/**
+ * What to do next, from the layer that refused. The code is more specific; the layer is enough to
+ * pick the right person and the right retry rule.
+ */
+export function guidance(error: AgentApiError): string {
+  switch (error.layer) {
+    case "policy":
+    case "budget":
+      return "The owner changes the rules or budget; repeating the request will not help.";
+    case "balance":
+      return error.availableAmount
+        ? `Fund the account or send at most ${error.availableAmount} (atomic units).`
+        : "Fund the account or send less.";
+    case "request":
+      return "Fix the input; do not retry it as it is.";
+    case "grant":
+      return "Issue a new grant or use a live one.";
+    case "auth":
+      return "Check the API key or the owner signature.";
+    case "provider":
+    case "api":
+      return error.retryable
+        ? "Retry the same request with the same Idempotency-Key."
+        : "Repeating it will not help; change the request or wait.";
+    default:
+      return "Not an API error document; check the proxy or network in between.";
+  }
+}
 
 async function capture(label: string, action: () => Promise<unknown>) {
   try {
@@ -27,8 +59,12 @@ async function capture(label: string, action: () => Promise<unknown>) {
           code: error.code,
           title: error.title,
           detail: error.detail,
+          layer: error.layer,
           retryable: error.retryable,
           availableAt: error.availableAt,
+          minAmount: error.minAmount,
+          availableAmount: error.availableAmount,
+          guidance: guidance(error),
           requestId: error.requestId,
           // Every entry, e.g. one per failed field.
           errors: error.errors,

@@ -8,7 +8,8 @@
  * Run: `pnpm 10:timelocked-payout`
  *
  * The delay postpones work rather than refusing it. A queued execution reserves no USD budget;
- * the charge is decided when it dispatches. Editing the policy invalidates queued work admitted
+ * the budget and limits are judged and charged when it dispatches. It does hold its funds: the
+ * balance's `available_raw` drops by the queued amount until the work dispatches or is cancelled. Editing the policy invalidates queued work admitted
  * under the previous revision.
  *
  * Policy changes are at least 10 minutes apart (`policy_change_throttled`), so this example sets
@@ -74,6 +75,11 @@ export async function timelockedPayout(agentId: string) {
       { idempotencyKey: `timelocked-${crypto.randomUUID()}` },
     );
 
+  // The queued transfer already holds its funds: `available_raw` drops, `balance_raw` does not.
+  const entry = (await api.getBalances(agentId)).balances.find(
+    (balance) => balance.asset_id === settings.token,
+  );
+
   // 3. Inspect the scheduler: earliest release first.
   const scheduled = await api.listScheduledExecutions(agentId, { limit: 10 });
 
@@ -87,6 +93,9 @@ export async function timelockedPayout(agentId: string) {
 
   return {
     queued: { correlation_id: queued.correlation_id, status: queued.status },
+    balance_while_queued: entry
+      ? { balance_raw: entry.balance_raw, available_raw: entry.available_raw }
+      : null,
     scheduled_count: scheduled.data.length,
     scheduled: scheduled.data.map((entry) => ({
       correlation_id: entry.correlation_id,
