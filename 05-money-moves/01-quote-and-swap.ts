@@ -14,7 +14,8 @@
  * A dry swap never refuses for rules or balance. Each check the live swap would fail comes back in
  * `warnings` under the live request's code (`policy_action_denied`, `policy_asset_denied`,
  * `unsupported_token`, `insufficient_balance` with `available_amount`, a budget or limit code, ...),
- * so read them before executing. In the live status, `details.amount_out` is final and present only
+ * so read them before executing. `owner_approval` true means the live swap waits in
+ * `PENDING_APPROVAL` for the owner instead of running at once. In the live status, `details.amount_out` is final and present only
  * on `SUCCESS` (or `REFUNDED` after a partial fill); until then `details.expected_amount_out` is an
  * estimate.
  */
@@ -39,6 +40,7 @@ export async function quoteAndSwap(agentId: string) {
     return {
       quote: quote.quote,
       warnings: quote.warnings,
+      owner_approval: quote.owner_approval,
       note: "Quote only. Set AGENT_EXECUTE=true to execute this swap.",
     };
   }
