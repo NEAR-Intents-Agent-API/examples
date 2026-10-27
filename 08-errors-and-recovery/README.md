@@ -12,7 +12,7 @@ Read this before writing retry logic. Mistakes here cost real money.
 ## Branch on `code`, never `title`
 
 Errors are JSON:API documents. `AgentApiError.code` is the first error's stable snake_case code;
-`layer`, `retryable`, `availableAt` and `requestId` are useful hints. Validation failures carry one
+`layer`, `retryable`, `availableAt`, `retryAfterSeconds` (the `Retry-After` header in whole seconds) and `requestId` are useful hints. Validation failures carry one
 entry per field in `errors`.
 
 Every error also names the layer that refused. Read it when you need to decide who acts next:

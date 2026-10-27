@@ -9,8 +9,8 @@
  * Errors are JSON:API documents. Branch on `error.code`; `layer` says whose rule refused (`request`,
  * `auth`, `grant`, `policy`, `budget`, `balance`, `provider` or `api`), so it picks the guidance.
  * `retryable` (the same Idempotency-Key can succeed), `availableAt` (from `meta.available_at`),
- * `minAmount`, `availableAmount` and `requestId` (from `meta.request_id`) guide retries and
- * support. Validation failures return one entry per field.
+ * `retryAfterSeconds` (the `Retry-After` header, when the response sent one), `minAmount`,
+ * `availableAmount` and `requestId` (from `meta.request_id`) guide retries and support. Validation failures return one entry per field.
  */
 import { AgentApiError } from "@near-intents-agent-api/sdk";
 import { agentApi } from "../support/client.js";
@@ -62,6 +62,7 @@ async function capture(label: string, action: () => Promise<unknown>) {
           layer: error.layer,
           retryable: error.retryable,
           availableAt: error.availableAt,
+          retryAfterSeconds: error.retryAfterSeconds,
           minAmount: error.minAmount,
           availableAmount: error.availableAmount,
           guidance: guidance(error),
