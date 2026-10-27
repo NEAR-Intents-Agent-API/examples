@@ -4,13 +4,15 @@ Delegated actions run through a grant (or, for deposits, just the API key). Ever
 a `correlation_id`; follow it with `GET /v1/status` until terminal. `dry: true` previews swaps and
 withdrawals without executing. A swap quote needs only the API key. A withdrawal preview needs the
 grant and an idempotency key (the SDK creates one), and each agent gets 20 previews per rolling 24
-hours, failed ones included (a refusal the provider states before it quotes gives its attempt
-back).
+hours; a provider refusal, an outage or an uncertain attempt stays counted, and only an answer the
+provider gives before running anything gives the attempt back.
 
-Neither preview refuses for rules or balance. Every check the live request would fail comes back in
-`warnings`: `policy_action_denied`, `policy_destination_denied`, `unsupported_token`,
-`invalid_address` and `insufficient_balance` (with `available_amount`), beside the budget, limit and
-schedule codes, `high_fee` and `asset_delivered_as_is`. Read them before you execute.
+Neither preview refuses for rules or balance. Every rule the live request would fail comes back in
+`warnings`: `policy_action_denied`, `policy_destination_denied` and `insufficient_balance` (with
+`available_amount`), beside the budget, limit and schedule codes, `high_fee` and
+`asset_delivered_as_is`. Read them before you execute. An unlisted asset (`unsupported_token`) or an
+invalid recipient (`invalid_address`) refuses the preview itself, before any provider call, and uses
+no preview attempt.
 
 | Example | Run | Policy must allow | Notes |
 |---|---|---|---|

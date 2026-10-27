@@ -17,10 +17,10 @@ import { intentsAccount } from "./destinations.js";
  * - `confidential`: also allows shielding, unshielding and the confidential form of each action.
  * - `owner_approval`: outgoing money actions (not deposits) wait for the owner's approval vote
  *   (NEAR, passkey and EVM owners).
- * - `assets`: `"any"`, or the exact asset ids the agent may spend. A swap may still buy an
- *   unlisted asset, but the agent cannot sell or move it until the owner lists it.
+ * - `assets`: `"any"`, or the exact asset ids the agent may spend (`"*"` is refused). A swap may
+ *   still buy an unlisted asset, but the agent cannot sell or move it until the owner lists it.
  * - `limits`: optional per-asset caps (`per_transaction`, `hourly`, `daily`, `monthly`) in atomic
- *   units.
+ *   units, keyed by exact asset id.
  * - `max_actions_per_hour`: a cap on money actions per hour, or `null` for none.
  * - `destinations`: `{ mode: "any" | "only" | "except", list }`.
  * - `budget`: USD caps per day, week and month across every asset, or `null`; each period starts
