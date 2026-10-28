@@ -9,12 +9,58 @@
  * One grant per session. The assistant never sees the API key; your backend runs the calls and
  * keeps the token. The assistant can do exactly what the account policy allows and no more,
  * within the shared USD budget; narrow the policy to narrow every grant.
+ *
+ * Set the policy before the first session. An assistant reads untrusted text (invoices, emails,
+ * web pages) and can be talked into paying a lookalike address or a fake "safe account"; the policy
+ * is what holds when it is fooled. Start from `assistantPolicy`: payee only, small per-transaction
+ * and daily caps, native methods off. Apply it with the `policy_update` shape in `pnpm 06:edit-policy`.
  */
+import type { Policy } from "@near-intents-agent-api/sdk";
 import { type AgentApi, agentApi, createGrantCredential } from "../support/client.js";
 import { banner, config, isMainModule, print, required, requireWrites } from "../support/config.js";
+import { intentsAccount } from "../support/destinations.js";
 import { runOwnerIntent, settleExecution } from "../support/flow.js";
 import { loadOwner } from "../support/near-owner.js";
 import { signNearIntent } from "../support/sign-near-intent.js";
+
+const nearUnits = (near: number) => `${near}${"0".repeat(24)}`;
+
+/**
+ * A starting policy for an assistant: swaps inside the account, transfers to one known payee, and
+ * caps of 3 NEAR per transaction and 10 NEAR a day on the token it spends. Add payees one by one as
+ * the owner trusts them; widen the caps only once the assistant has earned it.
+ *
+ * `native` is omitted, so every native method stays off. Keep it that way: native methods are for
+ * advanced users and are not protected by this policy.
+ */
+export function assistantPolicy(input: {
+  /** The only NEAR Intents account the assistant may send to. */
+  payee: string;
+  /** The asset the assistant spends. Defaults to wNEAR; any other token needs both caps. */
+  token?: string;
+  /** Atomic units of `token`. */
+  perTransaction?: string;
+  daily?: string;
+}): Policy {
+  const token = input.token ?? "nep141:wrap.near";
+  if (token !== "nep141:wrap.near" && (!input.perTransaction || !input.daily))
+    throw new Error(`Pass perTransaction and daily in ${token}'s atomic units`);
+  return {
+    frozen: false,
+    actions: ["swap", "transfer"],
+    confidential: false,
+    owner_approval: false,
+    assets: [token],
+    limits: {
+      per_transaction: { [token]: input.perTransaction ?? nearUnits(3) },
+      daily: { [token]: input.daily ?? nearUnits(10) },
+    },
+    max_actions_per_hour: 10,
+    destinations: { mode: "only", list: [intentsAccount(input.payee)] },
+    budget: { daily_usd: null, weekly_usd: null, monthly_usd: null },
+    timelock_ms: 0,
+  };
+}
 
 /** The assistant's tool definitions. Each maps to exactly one agent action. */
 export function assistantTools(api: AgentApi, agentId: string, token: string) {
@@ -93,6 +139,9 @@ export async function aiAssistant(agentId: string) {
     tool_names: Object.keys(tools),
     portfolio,
     quote: quote.quote,
+    suggested_policy: settings.recipient
+      ? assistantPolicy({ payee: settings.recipient })
+      : "Set AGENT_RECIPIENT to see the starting policy for this assistant.",
     note: "The token stays on your backend. Revoke this grant when the session ends.",
   };
 }
