@@ -17,9 +17,8 @@
  * allow (`policy_action_denied`, `policy_destination_denied`) or too little available balance
  * (`insufficient_balance` with `available_amount`) is listed in `warnings`, so read them before the
  * live withdrawal. An unlisted token (`unsupported_token`) or an invalid address (`invalid_address`)
- * refuses the preview itself, before any provider call and without using a preview attempt. A
- * provider refusal, an outage or an uncertain attempt stays counted against the daily limit; only
- * an answer the provider gives before running anything gives the attempt back. As with a swap, `details.amount_out` in
+ * refuses the preview itself, before any provider call. Each preview counts toward the
+ * wallet's 100 daily custody operations at the provider. As with a swap, `details.amount_out` in
  * the live status is final only on `SUCCESS`; before that read `details.expected_amount_out`.
  */
 import { agentApi } from "../support/client.js";
