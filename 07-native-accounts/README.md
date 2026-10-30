@@ -44,12 +44,19 @@ native: {
 - **The wallet provider enforces it**, so changing `native` is an on-chain policy change (`nep366`
   for NEAR owners, sponsored by the API) and the 10-minute policy cooldown applies.
 - **Any live grant** may use a switched-on method. Revoke the grant to stop one caller.
-- **The switch is the whole fence.** `destinations`, `budget`, `timelock_ms`, `schedule` and
-  `owner_approval` do not apply. A native NEAR transfer can go to any account, and signed typed
-  data (a permit, a `TransferWithAuthorization`) or a signed transaction can move everything at
-  that EVM or Solana address.
-- **Signing never broadcasts.** The signing routes return the signature; the caller hands it to
-  the app or sends the transaction. Every request is recorded in history as type `native`.
+- **The switch is nearly the whole fence.** NEAR a native transfer sends, or a call attaches as its
+  deposit, goes only where `destinations` allows (`policy_destination_denied`). `budget`,
+  `timelock_ms`, `schedule` and `owner_approval` do not apply. A NEAR call can move anything the
+  listed contract holds for the agent, and signed typed data (a permit, a
+  `TransferWithAuthorization`) or a signed transaction can move everything at that EVM or Solana
+  address.
+- **Signing never broadcasts.** The signing routes return the signature once; the caller hands it
+  to the app or sends the transaction. Every request is recorded in history as type `native`, with
+  `signature: null`.
+- **A NEAR transfer or call settles on chain.** It reads `SUCCESS` only once NEAR finalizes the
+  transaction the request asked for; a failed one reads `FAILED` (`native_transaction_failed`), and
+  one that does not match the request, or is still unknown 30 minutes after dispatch, reads
+  `NEEDS_REVIEW`.
 - **Only transactions are signed as transactions.** `evm/sign-transaction` takes one serialized
   unsigned EIP-2718 typed or EIP-155 legacy transaction whose chain id is `chain`'s;
   `solana/sign-transaction` takes one legacy or v0 transaction message. Anything else is

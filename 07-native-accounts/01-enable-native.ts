@@ -9,9 +9,10 @@
  * Run: `pnpm 07:enable-native` (NEP-413 only) or `pnpm 07:enable-native evm` (also the domain)
  *
  * Native methods are off until the owner adds the `native` block. The wallet provider enforces it,
- * so this is an on-chain policy change (`nep366`, gas sponsored by the API). None of the money
- * rules (`destinations`, `budget`, `timelock_ms`, `schedule`, `owner_approval`) applies to native
- * requests: the switch is the whole fence. Show the owner a warning before they sign it.
+ * so this is an on-chain policy change (`nep366`, gas sponsored by the API). One money rule binds
+ * native requests: NEAR a transfer sends, or a call attaches as its deposit, goes only where
+ * `destinations` allows. `budget`, `timelock_ms`, `schedule` and `owner_approval` do not apply.
+ * Show the owner a warning before they sign it.
  *
  * The NEAR Intents contracts (`intents.near`, `intents.far`) can never be listed: the API refuses
  * such a policy with `validation_failed`.
@@ -27,7 +28,7 @@ import { signNearIntent } from "../support/sign-near-intent.js";
 
 /** What your UI shows the owner before they sign a policy that turns on native methods. */
 export const nativeWarning =
-  "These switches let the agent use its own NEAR, EVM and Solana keys outside NEAR Intents. Your destinations, budget, delay, schedule and approval rules do not apply to them. A listed service may treat a signature as you logging in, and signed typed data or a signed transaction can move everything at that address. Only turn on what you trust.";
+  "Native methods are for advanced users and are not protected by most of this account's policy: budget, timelock, schedule and owner approval don't apply. A NEAR transfer goes only to the NEAR accounts your destinations allow, but a NEAR call can move anything the listed contract holds for the agent, and a signed EVM or Solana transaction, or EVM typed data such as a permit, can move everything at that address. Only switch on what the agent needs, for services you trust; a service may treat a signed message as you logging in.";
 
 export async function enableNative(agentId: string, recipient: string, evm: boolean) {
   if (isIntentsContract(recipient))

@@ -3,7 +3,7 @@
 Delegated actions run through a grant (or, for deposits, just the API key). Every action returns
 a `correlation_id`; follow it with `GET /v1/status` until terminal. `dry: true` previews swaps and
 withdrawals without executing. A swap quote needs only the API key. A withdrawal preview needs the
-grant and an idempotency key (the SDK creates one). The API sets no preview cap: each preview counts toward the wallet's 100 custody operations
+grant and an idempotency key (the SDK creates one). The API sets no preview cap: each preview counts toward the wallet's 1,000 custody operations
 per rolling 24 hours at the provider.
 
 Neither preview refuses for rules or balance. Every rule the live request would fail comes back in
