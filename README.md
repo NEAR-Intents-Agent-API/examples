@@ -69,8 +69,8 @@ inside NEAR Intents (public or confidential) under all controls at once: the gra
 until when), the policy (`actions`, `assets`, `limits`, `destinations`, owner approval, freeze),
 the USD `budget`, the `timelock_ms` execution delay and the owner's `schedule` of hours. None
 overrides another. The optional `native` block switches on the agent's own NEAR, EVM and Solana
-keys outside NEAR Intents, one method at a time; it is off by default, no money rule applies to
-it, and it never covers the NEAR Intents contracts.
+keys outside NEAR Intents, one method at a time; it is off by default, only `destinations` binds
+it (for the NEAR it sends), and it never covers the NEAR Intents contracts.
 
 ## SDK or HTTP
 
