@@ -30,6 +30,12 @@ export const exampleEnvSchema = z.object({
   AGENT_ID: optional,
   AGENT_RECIPIENT: optional,
   AGENT_SIGN_RECIPIENT: optional,
+  /** An address on Base the owner lists in `native.evm.sign_intent.withdrawals`. */
+  AGENT_WITHDRAW_ADDRESS: optional,
+  /** A Solana address `destinations` allows, for `solana/sign-transfer`. */
+  AGENT_SOLANA_RECIPIENT: optional,
+  /** Optional 1Click partner key (JWT) for the quotes `07-native-accounts` requests from 1Click. */
+  ONE_CLICK_API_KEY: optional,
   /** Defaults to `<API host>/log`. Pinned by you, never read from a proof. */
   AGENT_LOG_ORIGIN: optional,
   AGENT_TOKEN: z.string().trim().min(1).default("nep141:wrap.near"),
@@ -44,6 +50,7 @@ export const exampleEnvSchema = z.object({
   AGENT_REQUIRE_APPROVAL: flag,
   AGENT_COUNT: z.coerce.number().int().positive().max(20).default(2),
   AGENT_NEAR_RPC_URL: z.url().default("https://free.rpc.fastnear.com"),
+  AGENT_SOLANA_RPC_URL: z.url().default("https://api.mainnet-beta.solana.com"),
 });
 
 export type ExampleEnv = z.infer<typeof exampleEnvSchema>;

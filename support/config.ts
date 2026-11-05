@@ -16,6 +16,9 @@ export type ExampleConfig = {
   agentId?: string;
   recipient?: string;
   signRecipient?: string;
+  withdrawAddress?: string;
+  solanaRecipient?: string;
+  oneClickApiKey?: string;
   /** The transparency log origin proofs must name; pinned by you, never read from the API. */
   logOrigin: string;
   token: string;
@@ -26,6 +29,7 @@ export type ExampleConfig = {
   requireApproval: boolean;
   agentCount: number;
   nearRpcUrl: string;
+  solanaRpcUrl: string;
 };
 
 let cached: ExampleConfig | undefined;
@@ -43,6 +47,9 @@ export function config(): ExampleConfig {
     agentId: env.AGENT_ID,
     recipient: env.AGENT_RECIPIENT,
     signRecipient: env.AGENT_SIGN_RECIPIENT,
+    withdrawAddress: env.AGENT_WITHDRAW_ADDRESS,
+    solanaRecipient: env.AGENT_SOLANA_RECIPIENT,
+    oneClickApiKey: env.ONE_CLICK_API_KEY,
     // A deployment's log is `<API host>/log`: `api.agentsonintents.com/log` for the hosted API.
     logOrigin: env.AGENT_LOG_ORIGIN ?? `${api.host}/log`,
     token: env.AGENT_TOKEN,
@@ -53,6 +60,7 @@ export function config(): ExampleConfig {
     requireApproval: env.AGENT_REQUIRE_APPROVAL,
     agentCount: env.AGENT_COUNT,
     nearRpcUrl: env.AGENT_NEAR_RPC_URL,
+    solanaRpcUrl: env.AGENT_SOLANA_RPC_URL,
   };
   return cached;
 }
