@@ -45,7 +45,7 @@ Each numbered folder has its own README and numbered scripts. Every file starts 
 | [`04-grants`](04-grants/README.md) | Delegated access: issue, use, revoke | Yes |
 | [`05-money-moves`](05-money-moves/README.md) | Swap, transfer, withdraw, deposit, private balance, approvals | Yes |
 | [`06-policy-and-lifecycle`](06-policy-and-lifecycle/README.md) | Edit rules, schedule hours, freeze, archive, delete | Yes |
-| [`07-native-accounts`](07-native-accounts/README.md) | Agent's own NEAR, EVM and Solana keys: NEP-413 logins, typed data | Some |
+| [`07-native-accounts`](07-native-accounts/README.md) | Agent's own NEAR, EVM and Solana keys: NEP-413 logins, typed data, signed 1Click deposits, Solana sign-in and transfers | Some |
 | [`08-errors-and-recovery`](08-errors-and-recovery/README.md) | Error codes, statuses, idempotency, recovery | Some |
 | [`09-raw-http`](09-raw-http/README.md) | The same API with plain `fetch` and curl | Some |
 | [`10-recipes`](10-recipes/README.md) | BFF, timelocks, AI assistants, full journey | Yes |
@@ -69,8 +69,9 @@ inside NEAR Intents (public or confidential) under all controls at once: the gra
 until when), the policy (`actions`, `assets`, `limits`, `destinations`, owner approval, freeze),
 the USD `budget`, the `timelock_ms` execution delay and the owner's `schedule` of hours. None
 overrides another. The optional `native` block switches on the agent's own NEAR, EVM and Solana
-keys outside NEAR Intents, one method at a time; it is off by default, only `destinations` binds
-it (for the NEAR it sends), and it never covers the NEAR Intents contracts.
+keys, one method at a time; it is off by default, only `destinations` binds it (for the NEAR it
+sends), and the NEAR key never signs for the NEAR Intents contracts. The EVM and Solana keys sign
+Intents payloads only through `sign_intent`, under rules of their own.
 
 ## SDK or HTTP
 
@@ -105,7 +106,9 @@ use `@simplewebauthn/browser` in your frontend.
 | `raw-http.ts` | Plain `fetch` transport |
 | `destinations.ts`, `grant-store.ts`, `format.ts` | Typed destinations, example-only grant cache, atomic ↔ decimal conversion |
 | `identity.ts` | NEP-413 login requests and verification (the relying party's side) |
-| `native.ts` | The `native` policy block: `nativeOff`, `allOff`, the example EIP-712 domain |
+| `native.ts` | The `native` policy block: `nativeOff`, `allOff`, `changePolicy`, the example EIP-712 domain |
+| `one-click.ts` | 1Click quote, `generate-intent`, `submit-intent` and status with plain `fetch` |
+| `solana.ts` | base58 and a SOL transfer message for `solana/sign-transfer`, without a Solana library |
 
 ## Related
 

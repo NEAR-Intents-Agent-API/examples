@@ -35,6 +35,10 @@
     "07:evm-typed-data": "tsx --env-file-if-exists=.env 07-native-accounts/03-evm-typed-data.ts",
     "07:refusals": "tsx --env-file-if-exists=.env 07-native-accounts/04-refusals.ts",
     "07:disable-native": "tsx --env-file-if-exists=.env 07-native-accounts/05-disable-native.ts",
+    "07:enable-sign-intent": "tsx --env-file-if-exists=.env 07-native-accounts/06-enable-sign-intent.ts",
+    "07:sign-intent-deposit": "tsx --env-file-if-exists=.env 07-native-accounts/07-sign-intent-deposit.ts",
+    "07:enable-solana": "tsx --env-file-if-exists=.env 07-native-accounts/08-enable-solana.ts",
+    "07:solana": "tsx --env-file-if-exists=.env 07-native-accounts/09-solana-sign-in-and-transfer.ts",
     "08:error-taxonomy": "tsx --env-file-if-exists=.env 08-errors-and-recovery/01-error-taxonomy.ts",
     "08:status-and-uncertain": "tsx --env-file-if-exists=.env 08-errors-and-recovery/02-status-and-uncertain.ts",
     "08:idempotency": "tsx --env-file-if-exists=.env 08-errors-and-recovery/03-idempotency.ts",
@@ -51,7 +55,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@near-intents-agent-api/sdk": "^0.7.3",
+    "@near-intents-agent-api/sdk": "^0.7.4",
     "near-api-js": "^7.2.0",
     "viem": "^2.56.8",
     "zod": "^4.6.4"

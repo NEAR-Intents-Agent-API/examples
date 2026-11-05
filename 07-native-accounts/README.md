@@ -3,8 +3,9 @@
 Every agent wallet also has its own keys outside NEAR Intents: its NEAR account
 (`wallet.near_account_id`), one EVM address for every EVM chain (`wallet.evm_account_id`) and a
 Solana address (`wallet.solana_account_id`). The owner switches them on one method at a time in the
-policy's `native` block. These examples cover the two most common uses: signing NEP-413 messages (site logins) with the
-agent's NEAR key, and signing EIP-712 typed data for an app under one listed domain.
+policy's `native` block. These examples cover the common uses: signing NEP-413 messages (site logins) with the
+agent's NEAR key, signing EIP-712 typed data for an app under one listed domain, paying a 1Click
+deposit from the EVM key's Intents account, and Solana sign-in and transfers.
 
 | Example | Run | What it shows |
 |---|---|---|
@@ -13,12 +14,20 @@ agent's NEAR key, and signing EIP-712 typed data for an app under one listed dom
 | `03-evm-typed-data.ts` | `pnpm 07:evm-typed-data` | Sign typed data under the listed domain, recover the signer; another domain is refused |
 | `04-refusals.ts` | `pnpm 07:refusals` | Every refusal code, including `intents.near`/`intents.far` |
 | `05-disable-native.ts` | `pnpm 07:disable-native [all]` | Remove one service, or omit `native` to turn everything off |
+| `06-enable-sign-intent.ts` | `pnpm 07:enable-sign-intent` | Owner sets `evm.sign_intent`: 1Click deposits and one payout address |
+| `07-sign-intent-deposit.ts` | `pnpm 07:sign-intent-deposit [withdraw]` | Quote at 1Click, sign the payload with the EVM key, publish `signed_data` (dry unless `AGENT_EXECUTE=true`) |
+| `08-enable-solana.ts` | `pnpm 07:enable-solana` | Owner lists a sign-in domain and turns on `sign_transfer` for one recipient |
+| `09-solana-sign-in-and-transfer.ts` | `pnpm 07:solana` | Sign-In-With-Solana and one signed SOL transfer; nothing is broadcast |
 
-Set `AGENT_SIGN_RECIPIENT` in `.env` to the NEAR account or domain of the service the agent logs in to.
+Set `AGENT_SIGN_RECIPIENT` in `.env` to the NEAR account or domain of the service the agent logs in to
+(for Solana, a lowercase domain). `06`–`09` also read `AGENT_WITHDRAW_ADDRESS` (an address on
+Base), `AGENT_SOLANA_RECIPIENT`, `AGENT_SOLANA_RPC_URL` and the optional `ONE_CLICK_API_KEY`.
 
 ## Off until the owner turns it on
 
-`native` is optional and new policies leave it out. When present, every key is required:
+`native` is optional and new policies leave it out. When present, every key is required except the Solana and EVM switches added later
+(`evm.sign_intent`, `solana.sign_in`, `solana.sign_intent`, `solana.sign_transfer`), which are off
+when left out:
 
 ```ts
 native: {
@@ -35,8 +44,12 @@ native: {
 | `near.call` (contracts) | `near/call` (Idempotency-Key) | `nativeNearCall` |
 | `evm.sign_typed_data` (domains) | `evm/sign-typed-data` | `nativeEvmSignTypedData` |
 | `evm.sign_message` | `evm/sign-message` | `nativeEvmSignMessage` |
+| `evm.sign_intent` (rules) | `evm/sign-intent` | `nativeEvmSignIntent` |
 | `evm.sign_transaction` | `evm/sign-transaction` | `nativeEvmSignTransaction` |
+| `solana.sign_in` (domains) | `solana/sign-in` | `nativeSolanaSignIn` |
 | `solana.sign_message` | `solana/sign-message` | `nativeSolanaSignMessage` |
+| `solana.sign_intent` (rules) | `solana/sign-intent` | `nativeSolanaSignIntent` |
+| `solana.sign_transfer` | `solana/sign-transfer` | `nativeSolanaSignTransfer` |
 | `solana.sign_transaction` | `solana/sign-transaction` | `nativeSolanaSignTransaction` |
 
 - **Omitted** means every method is off. A policy update replaces the whole policy, so leaving
@@ -74,11 +87,50 @@ is refused with `native_method_denied`. `chainId` may be a number, a decimal or 
 domain's fields in EIP-712 order. List domains as narrowly as the app allows: Hyperliquid's
 `Exchange` domain (trading) never signs a `HyperliquidSignTransaction` withdrawal.
 
+## Signing NEAR Intents payloads
+
+The EVM and Solana keys sign a NEAR Intents payload (canonical JSON text, `transfer` intents only,
+`signer_id` = that key's Intents account) only through `sign-intent`; `sign-message` refuses one
+with `intents_payload_use_sign_intent`. The owner's rules are the key's own, and `destinations`,
+`assets`, `limits`, `budget`, `timelock_ms`, `schedule` and `owner_approval` do not apply:
+
+```ts
+sign_intent: {
+  receivers: [],                     // accounts a transfer may pay directly
+  one_click_deposits: true,          // 1Click deposits that pay the key or a receiver and refund the key
+  withdrawals: [{ chain: "base", address: "0x…" }], // 1Click deposits that pay out here (optional)
+  max_slippage_bps: 100,             // slippage plus 1Click's own fee, 0 to 300 (default 100)
+}
+```
+
+A transfer to a 1Click deposit address is checked against 1Click's live status for it: the quote
+must be `PENDING_DEPOSIT`, refund the key, pay the key, a receiver or a listed withdrawal address,
+carry no other app fee, rebate or custom message, and be paid with exactly its `amountIn`. A
+payload paying only such deposits may be due up to 96 hours ahead (1Click's `generate-intent`
+writes the quote's deadline); any other payload within 300 seconds. `07` shows the whole flow:
+quote with `dry: false`, `generate-intent`, `nativeEvmSignIntent`, then publish `signed_data` as is
+(1Click `submit-intent`, `intents.near` or a solver relay).
+
+A signed payload can be published by anyone who holds it until its deadline. **Freezing the account
+refuses new payloads but cannot recall one already signed.** List only the owner's own addresses in
+`withdrawals`, and sign payloads that are due soon.
+
+## Solana sign-in and transfers
+
+`solana.sign_in` lists domains. `solana/sign-in` takes the fields of the wallet standard's `signIn`
+input for a listed domain; the API writes the Sign-In-With-Solana message itself and returns it as
+`signed_message` next to the signature. `solana.sign_transfer` signs one SOL or SPL transfer
+(`{ unsigned_tx, recipient }`) when `destinations` allows `recipient` as a `withdraw` on chain
+`sol`; anything but that one transfer is refused with `solana_transaction_forbidden`. Neither
+needs `solana.sign_message` or `solana.sign_transaction`, which give full control of the address.
+Amounts are not checked yet: `sign_transfer` fences where funds go, not how much.
+
 ## Never the NEAR Intents contracts
 
-`intents.near` and `intents.far` can never be listed. A policy listing them is refused with
-`validation_failed`, a sign request naming them with `403 signing_recipient_forbidden`, and a
-native transfer or call to them with `403 native_contract_forbidden`, before the policy is read.
+`intents.near` and `intents.far` can never be listed for the NEAR key. A policy listing them is
+refused with `validation_failed`, a sign request naming them with `403 signing_recipient_forbidden`,
+and a native transfer or call to them with `403 native_contract_forbidden`, before the policy is
+read. The EVM and Solana keys reach them only through `sign-intent`.
 The NEP-413 payload cannot parse as an intent either: it is a message, a recipient and a nonce
 under a fixed tag, with no `signer_id`, `deadline` or `intents`.
 
