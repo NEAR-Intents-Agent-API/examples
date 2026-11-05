@@ -8,6 +8,8 @@
 
 </div>
 
+> The Agent API is an experimental, mainnet-only beta. You and your users may lose all assets used with it, or lose access to them. It is operated by NEAR Technologies Limited.
+
 Create an agent account, sign its rules, delegate access, move funds, recover from failures and
 verify an operation offline. Every script is short, documented and runs on its own with one API
 key (`naa_…`) from the [partner dashboard](https://partners.near-intents.org/) (**API keys**; shown once).
