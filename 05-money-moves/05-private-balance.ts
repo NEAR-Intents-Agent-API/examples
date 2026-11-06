@@ -3,7 +3,7 @@
  *
  * What: shields (public → confidential) and unshields (confidential → public), then shows both
  *       balance sheets.
- * When: when some or all of an agent's activity should settle on the private shard.
+ * When: when some or all of an agent's activity should use the confidential balance.
  * Needs: `AGENT_ALLOW_WRITES=true`, `AGENT_ID`, a stored grant, and a policy with
  *        `confidential: true`.
  * Run: `pnpm 05:private-balance`
