@@ -24,7 +24,7 @@ Browser                          Your backend                      Agent API
   │                                   ├───────────────────────────────▶│
 ```
 
-The API key (`naa_…`) and grant tokens (`ngt_…`) live only on the backend. The browser receives
+The partner API key and grant tokens (`ngt_…`) live only on the backend. The browser receives
 the prepared payload and returns the wallet's signature. The API alone authorizes actions.
 
 Next: [11 · Verify operations](../11-verify-operations/README.md).

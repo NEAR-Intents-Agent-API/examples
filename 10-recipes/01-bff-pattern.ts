@@ -7,7 +7,7 @@
  * Needs: `AGENT_ALLOW_WRITES=true`, owner keys, `AGENT_ID`.
  * Run: `pnpm 10:bff-pattern`
  *
- * The API key (`naa_…`) never reaches the browser. What crosses the boundary is only the
+ * The partner API key never reaches the browser. What crosses the boundary is only the
  * prepared payload, its public preview, and the wallet's output.
  */
 import {
