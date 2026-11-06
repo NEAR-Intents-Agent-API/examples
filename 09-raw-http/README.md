@@ -15,7 +15,7 @@ on writes, `X-Grant-Token` on delegated calls, JSON bodies, JSON:API errors. Eve
 
 ```sh
 API=https://api.agentsonintents.com
-KEY=naa_…
+KEY=...   # partner API key from the partner portal (opaque string, shown once)
 
 # Public reads
 curl "$API/v1/network"
@@ -58,7 +58,7 @@ curl "$API/v1/agents/$AGENT_ID/native/near/sign-message" \
 | `api.getStatus(cid, { waitMs })` | `GET /v1/status?correlation_id=…&wait_ms=…` |
 | `api.forGrant(t).swap(id, body, { idempotencyKey })` | `POST /v1/agents/{agent_id}/swap` + `X-Grant-Token` + `Idempotency-Key` |
 | `api.deposit(id, body, { idempotencyKey })` | `POST /v1/agents/{agent_id}/deposit` (no grant) |
-| `api.getOperationProof(id, cid)` | `GET /v1/agents/{agent_id}/operations/{correlation_id}/proof` |
+| `api.getOperationProof(id, cid, { from_size })` | `GET /v1/agents/{agent_id}/operations/{correlation_id}/proof?from_size=…` |
 | `api.forGrant(t).nativeNearSignMessage(id, body)` | `POST /v1/agents/{agent_id}/native/near/sign-message` + `X-Grant-Token` |
 | `api.forGrant(t).nativeNearTransfer(id, body, { idempotencyKey })` | `POST /v1/agents/{agent_id}/native/near/transfer` + `X-Grant-Token` + `Idempotency-Key` |
 | `api.forGrant(t).nativeEvmSignTypedData(id, body)` | `POST /v1/agents/{agent_id}/native/evm/sign-typed-data` + `X-Grant-Token` |

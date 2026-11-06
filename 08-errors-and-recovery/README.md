@@ -20,7 +20,7 @@ Every error also names the layer that refused. Read it when you need to decide w
 | `layer` | Whose rule | Next step |
 |---|---|---|
 | `request` | Shape, validation, idempotency, unknown ids, unsupported tokens, invalid addresses, amount minimums | Fix the input |
-| `auth` | API key, partner, owner signature, nonce, intent | Fix the credential or sign again |
+| `auth` | Partner API key, owner signature, nonce, intent | Fix the credential or sign again. `invalid_api_key`: check the key. `api_key_retired`: the key was created before the partner portal; create a new one in the portal |
 | `grant` | Grant token missing, expired, revoked, limits on grants | Issue or use a live grant |
 | `policy` | The account policy: action, asset, destination, schedule, per-asset and per-action limits, frozen | The owner changes the rules (or waits for the window) |
 | `budget` | The USD budget and its price | The owner raises the budget, or wait for the period to reset |

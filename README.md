@@ -12,7 +12,9 @@
 
 Create an agent account, sign its rules, delegate access, move funds, recover from failures and
 verify an operation offline. Every script is short, documented and runs on its own with one API
-key (`naa_…`) from the [partner dashboard](https://partners.near-intents.org/) (**API keys**; shown once).
+partner API key from the [partner portal](https://partners.near-intents.org/). The portal shows a key
+once and it expires after 365 days; to rotate, create a new key and revoke the old one. Treat the key
+as an opaque string.
 
 This folder is self-contained: it imports nothing from the API repository. Copy it anywhere,
 `pnpm install`, and it works.

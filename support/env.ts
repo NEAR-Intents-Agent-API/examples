@@ -38,6 +38,12 @@ export const exampleEnvSchema = z.object({
   ONE_CLICK_API_KEY: optional,
   /** Defaults to `<API host>/log`. Pinned by you, never read from a proof. */
   AGENT_LOG_ORIGIN: optional,
+  /** Defaults to the hosted API's witness key. Pinned by you, never read from an API response. */
+  AGENT_WITNESS_KEY: z
+    .string()
+    .trim()
+    .regex(/^[0-9a-f]{64}$/, "a 64-character lowercase hex public key")
+    .optional(),
   AGENT_TOKEN: z.string().trim().min(1).default("nep141:wrap.near"),
   AGENT_SWAP_TO: z.string().trim().min(1).default("nep141:usdt.tether-token.near"),
   AGENT_TRANSFER_AMOUNT: z

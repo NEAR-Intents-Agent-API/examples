@@ -22,6 +22,9 @@ import { loadGrant } from "../support/grant-store.js";
  * pick the right person and the right retry rule.
  */
 export function guidance(error: AgentApiError): string {
+  // Keys created before the partner portal are retired; the fix is a new key, not a retry.
+  if (error.code === "api_key_retired")
+    return "This key was created before the partner portal and is retired. Create a new key in the partner portal and send that instead.";
   switch (error.layer) {
     case "policy":
     case "budget":
@@ -35,7 +38,7 @@ export function guidance(error: AgentApiError): string {
     case "grant":
       return "Issue a new grant or use a live one.";
     case "auth":
-      return "Check the API key or the owner signature.";
+      return "Check the partner API key (create or rotate it in the partner portal) or the owner signature.";
     case "provider":
     case "api":
       return error.retryable
