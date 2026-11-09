@@ -26,6 +26,8 @@
     "05:deposit": "tsx --env-file-if-exists=.env 05-money-moves/04-deposit.ts",
     "05:private-balance": "tsx --env-file-if-exists=.env 05-money-moves/05-private-balance.ts",
     "05:approvals": "tsx --env-file-if-exists=.env 05-money-moves/06-approvals.ts",
+    "05:limit-order": "tsx --env-file-if-exists=.env 05-money-moves/07-limit-order.ts",
+    "05:limit-orders": "tsx --env-file-if-exists=.env 05-money-moves/08-limit-orders.ts",
     "06:edit-policy": "tsx --env-file-if-exists=.env 06-policy-and-lifecycle/01-edit-policy.ts",
     "06:freeze": "tsx --env-file-if-exists=.env 06-policy-and-lifecycle/02-freeze-and-unfreeze.ts",
     "06:archive-and-delete": "tsx --env-file-if-exists=.env 06-policy-and-lifecycle/03-archive-and-delete.ts",
@@ -55,7 +57,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@near-intents-agent-api/sdk": "^0.8.0",
+    "@near-intents-agent-api/sdk": "^0.8.1",
     "near-api-js": "^7.2.0",
     "viem": "^2.56.8",
     "zod": "^4.6.4"

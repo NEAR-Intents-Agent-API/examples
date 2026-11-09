@@ -47,7 +47,7 @@ Each numbered folder has its own README and numbered scripts. Every file starts 
 | [`02-your-first-agent`](02-your-first-agent/README.md) | Onboarding, reading an account | Yes (on-chain) |
 | [`03-owner-wallets`](03-owner-wallets/README.md) | NEAR, EVM and passkey owners | Yes |
 | [`04-grants`](04-grants/README.md) | Delegated access: issue, use, revoke | Yes |
-| [`05-money-moves`](05-money-moves/README.md) | Swap, transfer, withdraw, deposit, confidential balance, approvals | Yes |
+| [`05-money-moves`](05-money-moves/README.md) | Swap, limit orders, transfer, withdraw, deposit, confidential balance, approvals | Yes |
 | [`06-policy-and-lifecycle`](06-policy-and-lifecycle/README.md) | Edit rules, schedule hours, freeze, archive, delete | Yes |
 | [`07-native-accounts`](07-native-accounts/README.md) | Agent's own NEAR, EVM and Solana keys: NEP-413 logins, typed data, signed 1Click deposits, Solana sign-in and transfers | Some |
 | [`08-errors-and-recovery`](08-errors-and-recovery/README.md) | Error codes, statuses, idempotency, recovery | Some |
@@ -104,7 +104,7 @@ use `@simplewebauthn/browser` in your frontend.
 | `env.ts`, `config.ts` | Validate the environment once (zod); typed config, `requireWrites`, `print` |
 | `client.ts` | `agentApi()` built from `.env` |
 | `flow.ts` | `runOwnerIntent`, `waitForStatus`, `buildPolicyUpdate`, `settleExecution`, `settleApprovedExecution`, `assertCanUnfreeze` |
-| `policy.ts` | `transferPolicy` (tight) and `fullAccessPolicy` (broad), both complete `Policy` objects |
+| `policy.ts` | `transferPolicy` (tight) and `fullAccessPolicy` (broad, limit orders opt-in), both complete `Policy` objects |
 | `near-owner.ts`, `sign-near-intent.ts` | NEAR owner: keypair, NEP-413, NEP-366 |
 | `evm-owner.ts` | EVM owner: `viem`, EIP-712 |
 | `raw-http.ts` | Plain `fetch` transport |

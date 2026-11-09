@@ -40,6 +40,13 @@ Every error also names the layer that refused. Read it when you need to decide w
 | Per-asset limit or hourly action cap used up (shield and unshield count too) | `policy_limit_exceeded`, `policy_action_limit_exceeded` | Wait for the window or the owner raises it; a plain refusal, so a new request needs a new key |
 | Earlier actions the API cannot count against a limit | `policy_usage_unavailable` | Nothing was sent; wait until they leave the window |
 | Not enough available balance | `insufficient_balance` | Fund the account or send at most `availableAmount` |
+| The agent's own NEAR account holds less NEAR than the operation needs (a native NEAR call, or any custody operation that costs NEAR) | `custody_native_balance_required` | Fund `wallet.near_account_id`; `minAmount` is the call's cost and `availableAmount` what the account holds, both in yoctoNEAR (`details.available_amount` repeats the latter) |
+| Withdrawal to a NEAR account with no storage on the token's contract | `invalid_address` (409) | Register the receiver's storage (NEP-145), or move the funds inside NEAR Intents |
+| Limit order priced too far from the market | `policy_price_deviation_exceeded` | Price within `limit_order.max_deviation_bps` of the market, or the owner raises it |
+| No fresh price for a limit order's assets | `market_price_unavailable` | Retry later; nothing was sent |
+| Amount below the route's minimum, or a limit order worth under 0.1 USD | `amount_too_low` | Send more (`minAmount` states the route's minimum) |
+| Unknown limit order id | `limit_order_not_found` | Check the id (`listLimitOrders`) |
+| Deleting an agent with resting limit orders | `limit_orders_open` | Freeze the account (the API cancels them), then withdraw and delete |
 | Provider did not answer a quote | `provider_unavailable` | Retry the same request with the same key when `retryable` |
 | No route for this pair or amount | `route_unavailable` | Repeating will not help; try another amount or pair |
 | Malformed request | `validation_failed` | Fix the fields named in `errors` |

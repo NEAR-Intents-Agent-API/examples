@@ -31,7 +31,7 @@ await api.generateIntent({
 ```
 
 A grant carries no permissions. What every grantee may do is the account policy: its `actions`
-(`swap`, `transfer`, `withdraw`), `confidential` balances, `assets`, `limits` and `destinations`.
+(`swap`, `transfer`, `withdraw`, `limit_order`), `confidential` balances, `assets`, `limits` and `destinations`.
 Enable swaps with one `policy_update` and every live grant can swap at once — no new grant. A new
 account sends nowhere until the owner lists a destination the same way.
 

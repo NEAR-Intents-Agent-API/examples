@@ -51,6 +51,13 @@ export const exampleEnvSchema = z.object({
     .regex(/^[0-9]+$/, "atomic token units (a decimal integer)")
     .default("1"),
 
+  /** Quote units per one whole base unit, a plain decimal (`05:limit-order`). Market data, so no default. */
+  AGENT_LIMIT_PRICE: z
+    .string()
+    .trim()
+    .regex(/^[0-9]+(\.[0-9]+)?$/, "a plain decimal such as 5.2")
+    .optional(),
+
   AGENT_ALLOW_WRITES: flag,
   AGENT_EXECUTE: flag,
   AGENT_REQUIRE_APPROVAL: flag,

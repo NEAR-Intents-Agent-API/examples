@@ -58,6 +58,15 @@ Outside the schedule the API answers `403 policy_schedule_denied` with `availabl
 then with a new idempotency key. Deposits, identity signing (`sign`) and approval votes are never held.
 Omit `schedule` in a `policy_update` to remove it.
 
+## Limit orders and the policy
+
+Resting limit orders ([05](../05-money-moves/README.md#limit-orders)) depend on the policy. When the
+applied policy is frozen, or a `policy_update` leaves `limit_order` out of `actions`, the API
+cancels the agent's open orders itself. A cancel by the grant holder is always allowed, frozen or
+not, but the USD budget charged when an order was placed is not given back. The optional
+`limit_order: { max_deviation_bps }` (0 to 300, default 100) bounds how far worse than the market
+a new order may be priced.
+
 ## Cooldowns
 
 Policy edits and freeze/unfreeze share a configurable cooldown (default 10
@@ -69,5 +78,10 @@ change is allowed. Pure freeze bypasses the policy cooldown; unfreeze has its ow
 Deletion previews the exact assets that would be lost (`public`, `confidential`,
 `assets_lost`). The owner empties the wallet first; the beneficiary receives only the account's
 native NEAR. See `03-archive-and-delete.ts`.
+
+Deletion is also refused with `limit_orders_open` while any limit order is not payout-final; the
+preview's `deletion.open_limit_orders` counts them. That refusal comes before the balance check,
+since a cancel refunds into the balance: freeze the account (the API cancels its resting orders),
+then withdraw, then delete.
 
 Next: [07 · Native accounts](../07-native-accounts/README.md).

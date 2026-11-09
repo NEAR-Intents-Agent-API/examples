@@ -69,7 +69,10 @@ native: {
 - **A NEAR transfer or call settles on chain.** It reads `SUCCESS` only once NEAR finalizes the
   transaction the request asked for; a failed one reads `FAILED` (`native_transaction_failed`), and
   one that does not match the request, or is still unknown 30 minutes after dispatch, reads
-  `NEEDS_REVIEW`.
+  `NEEDS_REVIEW`. It spends NEAR on the agent's own account: when the account holds less than the
+  call costs, it is refused with `custody_native_balance_required` (`balance` layer), and the
+  error's `availableAmount` and `minAmount` state what the account holds and what the call costs,
+  in yoctoNEAR.
 - **Only transactions are signed as transactions.** `evm/sign-transaction` takes one serialized
   unsigned EIP-2718 typed or EIP-155 legacy transaction whose chain id is `chain`'s;
   `solana/sign-transaction` takes one legacy or v0 transaction message. Anything else is

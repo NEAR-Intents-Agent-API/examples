@@ -25,6 +25,9 @@ export function guidance(error: AgentApiError): string {
   // Keys created before the partner portal are retired; the fix is a new key, not a retry.
   if (error.code === "api_key_retired")
     return "This key was created before the partner portal and is retired. Create a new key in the partner portal and send that instead.";
+  // The shortfall is the agent's own NEAR account, in yoctoNEAR, not a balance to send less of.
+  if (error.code === "custody_native_balance_required")
+    return `Fund the agent's NEAR account: this call costs ${error.minAmount} yoctoNEAR and the account holds ${error.availableAmount}.`;
   switch (error.layer) {
     case "policy":
     case "budget":
