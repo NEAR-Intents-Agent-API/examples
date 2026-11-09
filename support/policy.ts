@@ -10,11 +10,14 @@ import { intentsAccount } from "./destinations.js";
  * action or adding a destination is one signature and every grant can use it at once, without a
  * new grant.
  *
- * The policy is always sent complete; every field is required except `schedule`:
+ * The policy is always sent complete; every field is required except `schedule` and `limit_order`:
  * - `frozen`: a frozen account refuses every action until the owner unfreezes it.
- * - `actions`: any of `swap`, `transfer`, `withdraw`. Deposits are always allowed and deletion is
- *   owner-only.
+ * - `actions`: any of `swap`, `transfer`, `withdraw`, `limit_order`. Deposits are always allowed and
+ *   deletion is owner-only.
  * - `confidential`: also allows shielding, unshielding and the confidential form of each action.
+ * - `limit_order`: optional `{ max_deviation_bps }` (0 to 300, 100 when omitted), how far worse
+ *   than the market a limit order may be priced. Freezing the account or applying a policy without
+ *   `limit_order` in `actions` makes the API cancel the agent's resting orders.
  * - `owner_approval`: outgoing money actions (not deposits) wait for the owner's approval vote
  *   (NEAR, passkey and EVM owners).
  * - `assets`: `"any"`, or the exact asset ids the agent may spend (`"*"` is refused). A swap may
@@ -81,13 +84,20 @@ export function fullAccessPolicy(input: {
   frozen?: boolean;
   /** Every money action waits for the owner's approval. */
   ownerApproval?: boolean;
+  /**
+   * Allows limit orders. `maxDeviationBps` bounds how far worse than the market a price may be
+   * (0 to 300); omit it for the API's default of 100. Left out, limit orders stay off.
+   */
+  limitOrder?: { maxDeviationBps?: number };
 }): Policy {
   const assets = input.assets ?? "any";
   const perTransaction = input.perTransaction ?? "1000000000000000000000000";
   const destinations = input.destinations ?? [];
   return {
     frozen: input.frozen ?? false,
-    actions: ["swap", "transfer", "withdraw"],
+    actions: input.limitOrder
+      ? ["swap", "transfer", "withdraw", "limit_order"]
+      : ["swap", "transfer", "withdraw"],
     confidential: true,
     owner_approval: input.ownerApproval ?? false,
     assets,
@@ -101,5 +111,8 @@ export function fullAccessPolicy(input: {
       destinations === "any" ? { mode: "any", list: [] } : { mode: "only", list: destinations },
     budget: input.budget ?? noBudget,
     timelock_ms: input.timelockMs ?? 0,
+    ...(input.limitOrder?.maxDeviationBps !== undefined && {
+      limit_order: { max_deviation_bps: input.limitOrder.maxDeviationBps },
+    }),
   };
 }

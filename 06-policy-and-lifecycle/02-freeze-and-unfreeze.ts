@@ -11,7 +11,8 @@
  * unfreeze has an independent one. Redundant freeze/unfreeze returns
  * `wallet_already_frozen` / `wallet_already_unfrozen`. Because unfreezes are 10 minutes apart,
  * the example checks `cooldowns.unfreeze_available_at` first instead of freezing an account it
- * could not unfreeze.
+ * could not unfreeze. Freezing also makes the API cancel the agent's resting limit orders
+ * (`05-money-moves/08-limit-orders.ts`); unfreezing does not bring them back.
  */
 import { type AgentApi, agentApi } from "../support/client.js";
 import { banner, config, isMainModule, print, required, requireWrites } from "../support/config.js";

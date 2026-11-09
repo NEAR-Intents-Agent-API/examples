@@ -11,7 +11,9 @@
  * and its history. `agent_archive` needs a frozen account, and `agent_restore` needs an unfrozen
  * one, so the example freezes first and unfreezes before restoring. Deletion previews exactly what
  * would be destroyed. If `assets_lost` is true, withdraw the public and confidential balances
- * first: this example refuses to continue.
+ * first: this example refuses to continue. A resting limit order refuses the deletion with
+ * `limit_orders_open` (the preview's `open_limit_orders` counts them) until it is payout-final;
+ * freezing makes the API cancel them.
  */
 import { type AgentApi, agentApi } from "../support/client.js";
 import { banner, config, isMainModule, print, required, requireWrites } from "../support/config.js";

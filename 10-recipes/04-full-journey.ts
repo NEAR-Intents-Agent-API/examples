@@ -52,7 +52,7 @@ export async function fullJourney() {
       expected_revision: current.revision,
       policy: {
         ...current.policy,
-        actions: [...current.policy.actions, "swap"] as ("swap" | "transfer" | "withdraw")[],
+        actions: [...current.policy.actions, "swap" as const],
         // A swap can buy an unlisted asset; listing it lets the agent sell or move it later.
         assets:
           current.policy.assets === "any"

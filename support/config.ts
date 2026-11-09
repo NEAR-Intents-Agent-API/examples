@@ -29,6 +29,7 @@ export type ExampleConfig = {
   token: string;
   swapToToken: string;
   transferAmount: string;
+  limitPrice?: string;
   allowWrites: boolean;
   execute: boolean;
   requireApproval: boolean;
@@ -61,6 +62,7 @@ export function config(): ExampleConfig {
     token: env.AGENT_TOKEN,
     swapToToken: env.AGENT_SWAP_TO,
     transferAmount: env.AGENT_TRANSFER_AMOUNT,
+    limitPrice: env.AGENT_LIMIT_PRICE,
     allowWrites: env.AGENT_ALLOW_WRITES,
     execute: env.AGENT_EXECUTE,
     requireApproval: env.AGENT_REQUIRE_APPROVAL,
