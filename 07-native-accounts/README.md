@@ -110,7 +110,7 @@ A transfer to a 1Click deposit address is checked against the quote 1Click signe
 is `{ payload, one_click_quotes }`: the live `POST /v0/quote` answer (not a dry one), sent exactly
 as 1Click returned it, one per deposit address the payload pays. The API verifies 1Click's
 signature offline and does not call 1Click. The quote must refund the key, pay the key, a receiver
-or a listed withdrawal address, carry no rebate or custom message, and be paid with exactly its
+or a listed withdrawal address, carry no custom recipient message or virtual-chain recipient, and be paid with exactly its
 `amountIn`. `max_slippage_bps` bounds the value lost at the quote's `minAmountOut` by 1Click's
 signed USD amounts, so fees and spread count too: a quote whose `slippageTolerance` equals the cap
 is refused, so request clearly less. Public and confidential (`intents.far`) deposits both work. A

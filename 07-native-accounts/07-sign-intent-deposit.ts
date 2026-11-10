@@ -25,7 +25,7 @@
  * signed quote vouches for, so `one_click_quotes` carries the live `POST /v0/quote` answer exactly
  * as 1Click returned it, one per deposit address the payload pays. The API checks 1Click's
  * signature offline and does not call 1Click. The quote must refund the signer, pay the signer or
- * a listed `withdrawals` address, carry no `rebates` or custom messages, and be a live quote
+ * a listed `withdrawals` address, carry no custom recipient message or virtual-chain recipient, and be a live quote
  * (not a dry one). The payload must pay exactly the quote's `amountIn`, and is due when the quote
  * is, up to 96 hours ahead. `max_slippage_bps` (100 by default) bounds the value lost at the
  * quote's `minAmountOut`, measured with 1Click's signed USD amounts, so fees and spread count

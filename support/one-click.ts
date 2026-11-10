@@ -46,7 +46,7 @@ const intents = "INTENTS";
  *
  * What the Agent API accepts in `sign_intent.one_click_deposits` / `withdrawals`: the quote
  * must refund `signer`, pay `signer` (`recipientType: "INTENTS"`) or a listed address
- * (`"DESTINATION_CHAIN"`), and carry no `rebates`, `customRecipientMsg` or virtual chain fields.
+ * (`"DESTINATION_CHAIN"`), and carry no `customRecipientMsg` or virtual chain fields.
  * `dry: false` creates the deposit address; a dry quote has none and cannot be signed for. The
  * response is returned as 1Click wrote it: the API verifies 1Click's signature on it.
  */
