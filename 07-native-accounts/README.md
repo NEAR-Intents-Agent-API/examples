@@ -102,17 +102,22 @@ sign_intent: {
   receivers: [],                     // accounts a transfer may pay directly
   one_click_deposits: true,          // 1Click deposits that pay the key or a receiver and refund the key
   withdrawals: [{ chain: "base", address: "0x…" }], // 1Click deposits that pay out here (optional)
-  max_slippage_bps: 100,             // slippage plus 1Click's own fee, 0 to 300 (default 100)
+  max_slippage_bps: 100,             // value lost at minAmountOut, fees included, 0 to 300 (default 100)
 }
 ```
 
-A transfer to a 1Click deposit address is checked against 1Click's live status for it: the quote
-must be `PENDING_DEPOSIT`, refund the key, pay the key, a receiver or a listed withdrawal address,
-carry no other app fee, rebate or custom message, and be paid with exactly its `amountIn`. A
+A transfer to a 1Click deposit address is checked against the quote 1Click signed for it. The body
+is `{ payload, one_click_quotes }`: the live `POST /v0/quote` answer (not a dry one), sent exactly
+as 1Click returned it, one per deposit address the payload pays. The API verifies 1Click's
+signature offline and does not call 1Click. The quote must refund the key, pay the key, a receiver
+or a listed withdrawal address, carry no rebate or custom message, and be paid with exactly its
+`amountIn`. `max_slippage_bps` bounds the value lost at the quote's `minAmountOut` by 1Click's
+signed USD amounts, so fees and spread count too: a quote whose `slippageTolerance` equals the cap
+is refused, so request clearly less. Public and confidential (`intents.far`) deposits both work. A
 payload paying only such deposits may be due up to 96 hours ahead (1Click's `generate-intent`
 writes the quote's deadline); any other payload within 300 seconds. `07` shows the whole flow:
-quote with `dry: false`, `generate-intent`, `nativeEvmSignIntent`, then publish `signed_data` as is
-(1Click `submit-intent`, `intents.near` or a solver relay).
+quote with `dry: false`, `generate-intent`, `nativeEvmSignIntent` with `one_click_quotes: [quote]`,
+then publish `signed_data` as is (1Click `submit-intent`, `intents.near` or a solver relay).
 
 A signed payload can be published by anyone who holds it until its deadline. **Freezing the account
 refuses new payloads but cannot recall one already signed.** List only the owner's own addresses in
