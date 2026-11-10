@@ -12,15 +12,17 @@
  * `sign_intent` is the only way the EVM key signs a NEAR Intents payload (`evm.sign_message`
  * refuses one), and only `transfer` intents:
  * - `receivers`: NEAR Intents accounts a transfer may pay. Empty here: nothing is paid directly.
- * - `one_click_deposits`: a transfer may also fund a 1Click deposit address whose live 1Click
- *   status shows a quote that pays the key (or a receiver) inside Intents and refunds the key.
+ * - `one_click_deposits`: a transfer may also fund a 1Click deposit address, given the live quote
+ *   1Click signed for it (`one_click_quotes`) that pays the key (or a receiver) inside Intents and
+ *   refunds the key.
  * - `withdrawals`: such a deposit may also pay out to a listed address on another chain. List only
  *   the owner's own addresses; spell the address as `destinations` does (lowercase for EVM).
- * - `max_slippage_bps` (0 to 300, 100 when omitted): the quote's slippage plus 1Click's own fee.
+ * - `max_slippage_bps` (0 to 300, 100 when omitted): the value the quote may lose at its
+ *   `minAmountOut`, fees and slippage included, by 1Click's signed USD amounts.
  *
  * These rules are the key's own: `destinations`, `assets`, `limits`, `budget`, `timelock_ms`,
  * `schedule` and `owner_approval` do not apply. No amount limit applies either: the loss is
- * bounded by slippage and 1Click's fee. The wallet provider enforces the policy, so this is an
+ * bounded by that slippage cap. The wallet provider enforces the policy, so this is an
  * on-chain change with the 10-minute cooldown, like `07:enable-native`.
  *
  * Solana has the same rules under `native.solana.sign_intent`.
@@ -30,7 +32,7 @@ import { changePolicy, nativeOff, type NativeRules } from "../support/native.js"
 
 /** What your UI shows the owner before they sign a policy that turns on `sign_intent`. */
 export const signIntentWarning =
-  "The agent's EVM key may sign payments from its own NEAR Intents account to 1Click deposit addresses whose quote pays that account back or pays one of the listed addresses, for exactly the quoted amount, within the slippage cap plus 1Click's fee. Your destinations, assets, limits and budget do not apply. A signed payload can be published by anyone who holds it until its deadline, up to 96 hours, and freezing the account does not recall one already signed.";
+  "The agent's EVM key may sign payments from its own NEAR Intents account to 1Click deposit addresses whose quote pays that account back or pays one of the listed addresses, for exactly the quoted amount, losing no more than the slippage cap, fees included. Your destinations, assets, limits and budget do not apply. A signed payload can be published by anyone who holds it until its deadline, up to 96 hours, and freezing the account does not recall one already signed.";
 
 export async function enableSignIntent(agentId: string, withdrawAddress: string | undefined) {
   const result = await changePolicy(agentId, (policy) => {

@@ -21,13 +21,18 @@
  * different account from the agent's NEAR one that `getBalances` reads. Fund it first, for
  * example with a 1Click deposit whose recipient is that address.
  *
- * Why the quote looks like this: the API signs only a transfer to a deposit address whose live
- * 1Click status shows `PENDING_DEPOSIT`, a refund to the signer, a payout to the signer or to a
- * listed `withdrawals` address, no `appFees`, `rebates` or custom messages, and slippage plus
- * 1Click's own fee (about 20 basis points for a swap) within `max_slippage_bps`. The payload must
- * pay exactly the quote's `amountIn`, and is due when the quote is, up to 96 hours ahead. A
- * signed payload can be published by anyone who holds it until then, and a freeze does not
- * recall it. The confidential form uses `CONFIDENTIAL_INTENTS` types and `intents.far`.
+ * Why the quote goes along: the API signs only a transfer to a deposit address that 1Click's own
+ * signed quote vouches for, so `one_click_quotes` carries the live `POST /v0/quote` answer exactly
+ * as 1Click returned it, one per deposit address the payload pays. The API checks 1Click's
+ * signature offline and does not call 1Click. The quote must refund the signer, pay the signer or
+ * a listed `withdrawals` address, carry no custom recipient message or virtual-chain recipient, and be a live quote
+ * (not a dry one). The payload must pay exactly the quote's `amountIn`, and is due when the quote
+ * is, up to 96 hours ahead. `max_slippage_bps` (100 by default) bounds the value lost at the
+ * quote's `minAmountOut`, measured with 1Click's signed USD amounts, so fees and spread count
+ * as well as slippage: a quote requesting slippage equal to the cap is refused, so ask clearly
+ * less (50 here). A signed payload can be published by anyone who holds it until then, and a
+ * freeze does not recall it. Public (`INTENTS`) and confidential (`CONFIDENTIAL_INTENTS`, signer
+ * on `intents.far`) deposits both work.
  */
 import { agentApi } from "../support/client.js";
 import { banner, config, isMainModule, print, required, requireWrites } from "../support/config.js";
@@ -62,8 +67,9 @@ export async function signIntentDeposit(agentId: string, withdraw: boolean, exec
     destinationAsset: withdraw ? baseUsdc : settings.swapToToken,
     amount: settings.transferAmount,
     withdrawTo,
-    // Slippage plus 1Click's own fee must stay within `max_slippage_bps` (100 by default).
-    slippageBps: 75,
+    // The value lost at `minAmountOut`, fees included, must stay within `max_slippage_bps` (100 by
+    // default), so request clearly less than the cap.
+    slippageBps: 50,
   });
   if (!execute)
     return {
@@ -75,7 +81,11 @@ export async function signIntentDeposit(agentId: string, withdraw: boolean, exec
   const depositAddress = required(quote.quote.depositAddress, "the quote's depositAddress");
   // 1Click writes the payload: one transfer of `amountIn` to the deposit address, due at the quote's deadline.
   const payload = await generateIntent(depositAddress, signer);
-  const signed = await delegate.nativeEvmSignIntent(agentId, { payload });
+  // The quote goes unchanged: the API verifies 1Click's signature on it.
+  const signed = await delegate.nativeEvmSignIntent(agentId, {
+    payload,
+    one_click_quotes: [quote],
+  });
 
   // `signed_data` goes out as is. intents.near (`execute_intents`) or a solver relay take it too.
   const submitted = await submitIntent(signed.signed_data);

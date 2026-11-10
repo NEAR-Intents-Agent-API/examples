@@ -1,11 +1,12 @@
 import { setTimeout as sleep } from "node:timers/promises";
+import type { OneClickQuote } from "@near-intents-agent-api/sdk";
 import { config } from "./config.js";
 
 /**
  * A minimal client for the 1Click API (https://docs.near-intents.org), the quote and swap service
  * of NEAR Intents. It is not part of the Agent API: the examples call it with plain `fetch`, as
- * your backend would. The Agent API only signs; it reads 1Click's own status for a deposit
- * address before it signs a transfer to it.
+ * your backend would. The Agent API only signs; it checks 1Click's signature on the quote you
+ * send with the payload before it signs a transfer to a deposit address.
  *
  * `ONE_CLICK_API_KEY` is optional. It is sent as a bearer token and stays on your backend.
  */
@@ -45,8 +46,9 @@ const intents = "INTENTS";
  *
  * What the Agent API accepts in `sign_intent.one_click_deposits` / `withdrawals`: the quote
  * must refund `signer`, pay `signer` (`recipientType: "INTENTS"`) or a listed address
- * (`"DESTINATION_CHAIN"`), and carry no `appFees`, `rebates`, `customRecipientMsg` or virtual
- * chain fields. `dry: false` creates the deposit address; a dry quote has none.
+ * (`"DESTINATION_CHAIN"`), and carry no `customRecipientMsg` or virtual chain fields.
+ * `dry: false` creates the deposit address; a dry quote has none and cannot be signed for. The
+ * response is returned as 1Click wrote it: the API verifies 1Click's signature on it.
  */
 export function requestQuote(input: {
   dry: boolean;
@@ -56,7 +58,7 @@ export function requestQuote(input: {
   amount: string;
   /** Pays out to this address on the destination asset's chain instead of back to `signer`. */
   withdrawTo?: string;
-  /** Slippage in basis points; with 1Click's own fee it must stay within `max_slippage_bps`. */
+  /** Slippage in basis points. Keep it clearly under `max_slippage_bps`: fees count against the cap too. */
   slippageBps: number;
 }) {
   return call<Quote>("POST", "/v0/quote", {
@@ -76,10 +78,12 @@ export function requestQuote(input: {
   });
 }
 
-export type Quote = {
-  correlationId?: string;
+/**
+ * 1Click's quote response, as returned. The Agent API takes it unchanged in `one_click_quotes`;
+ * a dry quote has no deposit address or signature, so only a `dry: false` one can go there.
+ */
+export type Quote = OneClickQuote & {
   quote: {
-    depositAddress?: string;
     amountIn: string;
     amountInFormatted?: string;
     amountOut: string;
