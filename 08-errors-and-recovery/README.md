@@ -37,8 +37,9 @@ Every error also names the layer that refused. Read it when you need to decide w
 | Destination outside the account rule | `policy_destination_denied` | Owner adds it to `policy.destinations`; no new grant |
 | Provider policy refuses | `policy_denied` | Change the policy (owner) |
 | USD budget exhausted | `spend_budget_exceeded` | Wait until that cap's `usage.budget.<window>.resets_at` (its period ends and the whole cap is back), or the owner raises it; a plain refusal, so a new request needs a new key |
-| Per-asset limit or hourly action cap used up (shield and unshield count too) | `policy_limit_exceeded`, `policy_action_limit_exceeded` | Wait for the window or the owner raises it; a plain refusal, so a new request needs a new key |
+| Per-asset limit or hourly action cap used up (shield counts too) | `policy_limit_exceeded`, `policy_action_limit_exceeded` | Wait for the window or the owner raises it; a plain refusal, so a new request needs a new key |
 | Earlier actions the API cannot count against a limit | `policy_usage_unavailable` | Nothing was sent; wait until they leave the window |
+| `confidential: false` on a swap, limit order, transfer or deposit address, or any `unshield` (400, `request` layer) | `public_balance_exit_only` | Leave `confidential` out: the confidential balance is the account. Legacy public funds leave only by `shield` or a withdrawal with `confidential: false`; a plain refusal, so fix the request |
 | Not enough available balance | `insufficient_balance` | Fund the account or send at most `availableAmount` |
 | The agent's own NEAR account holds less NEAR than the operation needs (a native NEAR call, or any custody operation that costs NEAR) | `custody_native_balance_required` | Fund `wallet.near_account_id`; `minAmount` is the call's cost and `availableAmount` what the account holds, both in yoctoNEAR (`details.available_amount` repeats the latter) |
 | Withdrawal to a NEAR account with no storage on the token's contract | `invalid_address` (409) | Register the receiver's storage (NEP-145), or move the funds inside NEAR Intents |

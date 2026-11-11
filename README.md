@@ -53,7 +53,7 @@ Each numbered folder has its own README and numbered scripts. Every file starts 
 | [`08-errors-and-recovery`](08-errors-and-recovery/README.md) | Error codes, statuses, idempotency, recovery | Some |
 | [`09-raw-http`](09-raw-http/README.md) | The same API with plain `fetch` and curl | Some |
 | [`10-recipes`](10-recipes/README.md) | BFF, timelocks, AI assistants, full journey | Yes |
-| [`11-verify-operations`](11-verify-operations/README.md) | Prove an execution's audit trail offline | No |
+| [`11-verify-operations`](11-verify-operations/README.md) | Prove an execution's audit trail offline; payment receipts | Some |
 
 ## Safety
 
@@ -69,7 +69,7 @@ Each numbered folder has its own README and numbered scripts. Every file starts 
 An **agent** is one agent account: an agent wallet, one owner-signed **policy** and one USD usage
 ledger. **Access belongs to a grant; rules belong to the account.** Your backend holds the API
 key; the owner signs once to create the agent and once to issue each grant. The agent executes
-inside NEAR Intents (public or confidential) under all controls at once: the grant (who may act,
+inside NEAR Intents, on its confidential balance, under all controls at once: the grant (who may act,
 until when), the policy (`actions`, `assets`, `limits`, `destinations`, owner approval, freeze),
 the USD `budget`, the `timelock_ms` execution delay and the owner's `schedule` of hours. None
 overrides another. The optional `native` block switches on the agent's own NEAR, EVM and Solana

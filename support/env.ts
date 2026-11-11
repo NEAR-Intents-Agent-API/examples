@@ -38,6 +38,8 @@ export const exampleEnvSchema = z.object({
   ONE_CLICK_API_KEY: optional,
   /** Defaults to `<API host>/log`. Pinned by you, never read from a proof. */
   AGENT_LOG_ORIGIN: optional,
+  /** Where the log's tiles are served, over HTTPS. Defaults to the hosted log. */
+  AGENT_LOG_URL: z.url().optional(),
   /** Defaults to the hosted API's witness key. Pinned by you, never read from an API response. */
   AGENT_WITNESS_KEY: z
     .string()

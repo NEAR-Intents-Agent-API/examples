@@ -54,6 +54,7 @@
     "10:ai-assistant": "tsx --env-file-if-exists=.env 10-recipes/03-ai-assistant.ts",
     "10:full-journey": "tsx --env-file-if-exists=.env 10-recipes/04-full-journey.ts",
     "11:verify-operation": "tsx --env-file-if-exists=.env 11-verify-operations/01-verify-operation.ts",
+    "11:payment-receipt": "tsx --env-file-if-exists=.env 11-verify-operations/02-payment-receipt.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
