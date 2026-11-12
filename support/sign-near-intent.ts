@@ -7,6 +7,7 @@ import {
   JsonRpcProvider,
   type KeyPair,
   Signature,
+  SignedDelegate,
 } from "near-api-js";
 import { signNep413 } from "./near-owner.js";
 
@@ -70,10 +71,12 @@ export async function signNearIntent(
   return {
     ...intent,
     signed_delegate: Buffer.from(
-      encodeSignedDelegate({
-        delegateAction,
-        signature: new Signature({ keyType: 0, data: keyPair.sign(digest).signature }),
-      }),
+      encodeSignedDelegate(
+        new SignedDelegate({
+          delegateAction,
+          signature: new Signature({ keyType: 0, data: keyPair.sign(digest).signature }),
+        }),
+      ),
     ).toString("base64"),
   };
 }
