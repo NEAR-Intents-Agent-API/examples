@@ -16,9 +16,9 @@
  *
  * `quantity` is atomic units of the base asset and `price` is quote units per one whole base unit.
  * A `sell` spends `quantity` of the base asset; a `buy` spends `ceil(quantity × price)` of the
- * quote asset. Add `confidential: true` to use the confidential balance (the policy needs
- * `confidential` too). The order rests until it fills, is cancelled or reaches `deadline` (at
- * most seven days, the default).
+ * quote asset. The order is funded from the confidential balance (the policy needs `confidential`
+ * on); `confidential: false` is refused with `public_balance_exit_only`. The order rests until it
+ * fills, is cancelled or reaches `deadline` (at most seven days, the default).
  *
  * `SUCCESS` means the order is funded and resting, not filled: `details.order_id` names it, and
  * `getLimitOrder` reads its live `fill_status`. 1Click's own fee (20 bps) is in the order's

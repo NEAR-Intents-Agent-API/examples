@@ -9,6 +9,10 @@
  *        `AGENT_ALLOW_WRITES=true` + `AGENT_EXECUTE=true` for the live withdrawal.
  * Run: `pnpm 05:withdraw`
  *
+ * A withdrawal pays from the confidential balance by default. `confidential: false` is the one exit
+ * for the legacy public balance (pass it with the same amount, chain and recipient); the policy
+ * judges that withdrawal like any other.
+ *
  * Cross-chain bridges outlive a synchronous request. `async: true` returns as soon as the bridge
  * accepts the request; keep following the correlation id. The recipient, chain and memo must match a
  * policy destination exactly — including the memo (`null` means no memo). NEAR (`nep141:wrap.near`)

@@ -10,6 +10,7 @@ witness key you pinned.
 | Example | Run | What it shows |
 |---|---|---|
 | `01-verify-operation.ts` | `pnpm 11:verify-operation [op_…]` | Read the witness head, fetch an execution's proof that extends it, and check it with `verifyOperationProof` |
+| `02-payment-receipt.ts` | `pnpm 11:payment-receipt` | Transfer with a `reference` and a `note`, read and list its receipt, verify it as a payee with `verifyPaymentReceipt` (writes: needs `AGENT_ALLOW_WRITES=true`) |
 
 ## Fetch and verify
 
@@ -50,6 +51,56 @@ proof, so run it again in a moment (the example prints this instead of failing).
 | `PENDING` | Recorded, waiting for the next checkpoint (seconds to minutes) |
 | `UNLOGGED` | Recorded before the log started |
 
+## Receipts
+
+A completed transfer, withdrawal, swap, limit order or deposit has a **receipt**: its own leaf of the
+same log, written when the execution settles. It commits only to the settled terms, the
+execution's id and the time, so it names no agent, account or grant and is safe to hand to a payee,
+who verifies it without an API key. It does not prove who paid; hand over the operation proof as
+well when identity matters.
+
+```ts
+import {
+  fetchWitnessCheckpoint,
+  logTileReader,
+  verifyPaymentReceipt,
+} from "@near-intents-agent-api/sdk";
+
+// Pay with a reference the payee issued. `note` stays with the owner and never enters the receipt.
+const { correlation_id } = await bot.transfer(
+  agentId,
+  { asset, amount, recipient, reference: "order-123", note: "Invoice 123" },
+  { idempotencyKey },
+);
+
+const item = await api.getReceipt(agentId, correlation_id); // `receipt` is null while `PENDING`
+const page = await api.listReceipts(agentId, { type: "transfer" }); // newest first
+
+// The payee, with only `item.receipt` and what it is owed:
+const verified = await verifyPaymentReceipt(item.receipt, {
+  origin,
+  trusted: await fetchWitnessCheckpoint(apiUrl, origin, witnessKey),
+  readTile: logTileReader("https://log.agentsonintents.com/"),
+  expect: { recipient, asset, amount, reference: "order-123" },
+});
+```
+
+- `verifyReceipt` checks any receipt and returns its terms; `verifyPaymentReceipt` also checks the
+  exact recipient, asset, amount and reference (plus `chain` and `memo` for a withdrawal) of a
+  transfer or withdrawal.
+- Leaving `expect.confidential` out accepts a confidential payment only, the account's default. A
+  payment from the legacy public balance (a withdrawal sent with `confidential: false`) needs
+  `expect.confidential: false`.
+- A withdrawal's `amount` is the debit, fees come out of it, so the receipt does not prove what
+  arrived; read `amountOut` or the destination chain. A limit order's receipt proves it was funded
+  and placed, not filled.
+- `ReceiptNotCoveredError` (the trusted head is older than the receipt) and `LogUnavailableError`
+  say nothing about the receipt: fetch a newer head or wait, then verify again. `NoteError` or
+  `ProofError` means it does not prove the settlement.
+- A receipt lasts as long as the audit log keeps it (90 days). Executions settled before receipts
+  existed have none, and native signing routes, shield and unshield never do.
+- The log's tiles are read from `AGENT_LOG_URL` (default `https://log.agentsonintents.com/`).
+
 ## Pin the origin and the witness key
 
 The origin is `<API host>/log`: `api.agentsonintents.com/log` for the hosted API. It defaults to
@@ -66,7 +117,7 @@ the notary's TDX birth quote in `proof.notary.birth` with a quote verifier such 
 dstack-verifier and compare its `report_data` with
 `verified.birthReportData`. The public log tiles are served at `https://log.agentsonintents.com/`.
 
-The example needs the partner API key and `AGENT_ID` (it lists the agent's history and reads its
-proof), so it is not a keyless read.
+`01-verify-operation.ts` needs the partner API key and `AGENT_ID` (it lists the agent's history and
+reads its proof), so it is not a keyless read.
 
 Next: [back to the examples index](../README.md).

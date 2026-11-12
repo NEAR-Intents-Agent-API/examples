@@ -48,7 +48,7 @@ export function assistantPolicy(input: {
   return {
     frozen: false,
     actions: ["swap", "transfer"],
-    confidential: false,
+    confidential: true,
     owner_approval: false,
     assets: [token],
     limits: {
@@ -66,11 +66,13 @@ export function assistantPolicy(input: {
 export function assistantTools(api: AgentApi, agentId: string, token: string) {
   return {
     async get_portfolio() {
-      const [publicBalances, confidential] = await Promise.all([
+      // The confidential balance is the account and the default read. `source: "public"` reads the
+      // legacy public balance, which the assistant can only withdraw or shield.
+      const [confidential, legacyPublic] = await Promise.all([
+        api.getBalances(agentId),
         api.getBalances(agentId, { source: "public" }),
-        api.getBalances(agentId, { source: "confidential" }),
       ]);
-      return { public: publicBalances.balances, confidential: confidential.balances };
+      return { confidential: confidential.balances, legacy_public: legacyPublic.balances };
     },
     async quote_swap(input: { from: string; to: string; amount: string }) {
       return api.forGrant(token).swap(agentId, {

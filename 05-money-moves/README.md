@@ -16,13 +16,22 @@ a token withdrawal to a NEAR account with no storage on that token's contract, s
 deposit address for NEAR USDC: it answers `invalid_address` (409). Register the receiver's storage
 first (NEP-145 `storage_deposit`), or move the funds inside NEAR Intents.
 
+## Confidential by default
+
+Every money request runs on the agent's confidential balance, and `getBalances` reads it unless
+you pass `source: "public"`. Leave `confidential` out of swaps, limit orders, transfers and deposit
+addresses: `confidential: false` is refused with `public_balance_exit_only`, live and dry. A
+withdrawal pays from the confidential balance too. The public balance is a legacy balance that
+only has a way out: `shield` moves it into the confidential balance, and a withdrawal with
+`confidential: false` pays it to a chain address. `unshield` is always refused.
+
 | Example | Run | Policy must allow | Notes |
 |---|---|---|---|
 | `01-quote-and-swap.ts` | `pnpm 05:quote-and-swap` | `actions: ["swap"]` | Always quotes; live swap when `AGENT_EXECUTE=true` |
 | `02-transfer.ts` | `pnpm 05:transfer` | `actions: ["transfer"]` + recipient | Moves between NEAR Intents accounts |
 | `03-withdraw.ts` | `pnpm 05:withdraw` | `actions: ["withdraw"]` + chain address | Previews, then withdraws cross-chain |
 | `04-deposit.ts` | `pnpm 05:deposit` | nothing | Issues an address (`origin_asset`, optional `amount`); no grant, refunds go to the agent |
-| `05-private-balance.ts` | `pnpm 05:private-balance` | `confidential: true` | Public ↔ confidential balance |
+| `05-private-balance.ts` | `pnpm 05:private-balance` | `confidential: true` | Reads both balances, shields legacy public funds, previews a public withdrawal |
 | `06-approvals.ts` | `pnpm 05:approvals` | `owner_approval: true` | `PENDING_APPROVAL` → owner vote → settle |
 | `07-limit-order.ts` | `pnpm 05:limit-order` | `actions: ["limit_order"]` | Previews with the API key alone; places a resting order when `AGENT_EXECUTE=true`; needs `AGENT_LIMIT_PRICE` |
 | `08-limit-orders.ts` | `pnpm 05:limit-orders` | nothing (cancels need only a grant) | Lists, reads, cancels one, cancels all; cancels only when `AGENT_EXECUTE=true` |
@@ -32,8 +41,8 @@ first (NEP-145 `storage_deposit`), or move the funds inside NEAR Intents.
 A limit order rests on the NEAR Intents order book until it fills, is cancelled or reaches its
 `deadline` (default and maximum seven days). A `sell` spends `quantity` (atomic units) of the base
 asset; a `buy` spends `ceil(quantity × price)` of the quote asset; `price` is quote units per one
-whole base unit. The policy must list `limit_order` in `actions` (and `confidential` for
-`confidential: true`). An optional `limit_order: { max_deviation_bps }` (0 to 300, default 100)
+whole base unit. The policy must list `limit_order` in `actions` and have `confidential` on: the
+order is funded from the confidential balance. An optional `limit_order: { max_deviation_bps }` (0 to 300, default 100)
 bounds how far worse than the market the price may be:
 
 ```ts

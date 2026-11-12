@@ -4,7 +4,8 @@ import type { Destination } from "@near-intents-agent-api/sdk";
  * Typed destinations for the account policy's `destinations` rule.
  *
  * A destination names one place funds may go, exactly:
- * - `{ action: "transfer", address, confidential }`: a NEAR Intents account, public or confidential.
+ * - `{ action: "transfer", address, confidential }`: a NEAR Intents account. A newly signed policy
+ *   lists only confidential ones (`confidential: true`), since every transfer is confidential.
  * - `{ action: "withdraw", chain, address, memo }`: an address on another chain, with the exact
  *   memo or `null` for none.
  *
@@ -15,7 +16,7 @@ import type { Destination } from "@near-intents-agent-api/sdk";
  */
 
 /** A payout to a NEAR Intents account (transfer target). */
-export function intentsAccount(address: string, confidential = false): Destination {
+export function intentsAccount(address: string, confidential = true): Destination {
   return { action: "transfer", address, confidential };
 }
 

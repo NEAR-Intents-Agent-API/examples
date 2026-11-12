@@ -31,7 +31,7 @@ await api.generateIntent({
 ```
 
 A grant carries no permissions. What every grantee may do is the account policy: its `actions`
-(`swap`, `transfer`, `withdraw`, `limit_order`), `confidential` balances, `assets`, `limits` and `destinations`.
+(`swap`, `transfer`, `withdraw`, `limit_order`), `confidential` (on in every new policy), `assets`, `limits` and `destinations`.
 Enable swaps with one `policy_update` and every live grant can swap at once — no new grant. A new
 account sends nowhere until the owner lists a destination the same way.
 
@@ -46,7 +46,7 @@ as `X-Grant-Token` on delegated calls only.
 - `policy_denied` — the account's provider policy (assets, limits, hourly rate).
 - `spend_budget_exceeded` — the account's USD budget.
 - `policy_limit_exceeded`, `policy_action_limit_exceeded` — the per-asset limits and hourly action
-  cap, which the API counts across every grant (shield and unshield included).
+  cap, which the API counts across every grant (shield included).
 
 Raising the USD budget never lifts a per-asset limit. Change the rule that refused; grants never
 need reissuing for it.

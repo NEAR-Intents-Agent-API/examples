@@ -14,7 +14,9 @@ import { intentsAccount } from "./destinations.js";
  * - `frozen`: a frozen account refuses every action until the owner unfreezes it.
  * - `actions`: any of `swap`, `transfer`, `withdraw`, `limit_order`. Deposits are always allowed and
  *   deletion is owner-only.
- * - `confidential`: also allows shielding, unshielding and the confidential form of each action.
+ * - `confidential`: the agent's account is its confidential balance, so a newly signed policy must
+ *   set it to `true`, and every `transfer` destination must be a confidential account. It allows
+ *   shielding and the confidential form of each action (the default for every money request).
  * - `limit_order`: optional `{ max_deviation_bps }` (0 to 300, 100 when omitted), how far worse
  *   than the market a limit order may be priced. Freezing the account or applying a policy without
  *   `limit_order` in `actions` makes the API cancel the agent's resting orders.
@@ -51,7 +53,7 @@ export function transferPolicy(input: {
   return {
     frozen: false,
     actions: ["transfer"],
-    confidential: false,
+    confidential: true,
     owner_approval: requireApproval,
     assets: [token],
     limits: { per_transaction: { [token]: "1000000000000000000000000" } },

@@ -10,6 +10,9 @@ import { parseExampleEnv } from "./env.js";
 /** The hosted API's checkpoint witness key (`api.agentsonintents.com`); another deployment has its own. */
 const HOSTED_WITNESS_KEY = "598165a18b588f504e159c0e2573d73983ae22bf15cf80d36902276d63a11101";
 
+/** The hosted log's tiles, in tlog-tiles layout; another deployment serves its own. */
+const HOSTED_LOG_URL = "https://log.agentsonintents.com/";
+
 export type ExampleConfig = {
   apiUrl: string;
   apiKey: string;
@@ -24,6 +27,8 @@ export type ExampleConfig = {
   oneClickApiKey?: string;
   /** The transparency log origin proofs must name; pinned by you, never read from the API. */
   logOrigin: string;
+  /** Where the log's tiles are read from (HTTPS); receipts are verified against them. */
+  logUrl: string;
   /** The checkpoint witness's public key (hex); pinned by you, never read from the API. */
   witnessKey: string;
   token: string;
@@ -58,6 +63,7 @@ export function config(): ExampleConfig {
     oneClickApiKey: env.ONE_CLICK_API_KEY,
     // A deployment's log is `<API host>/log`: `api.agentsonintents.com/log` for the hosted API.
     logOrigin: env.AGENT_LOG_ORIGIN ?? `${api.host}/log`,
+    logUrl: env.AGENT_LOG_URL ?? HOSTED_LOG_URL,
     witnessKey: env.AGENT_WITNESS_KEY ?? HOSTED_WITNESS_KEY,
     token: env.AGENT_TOKEN,
     swapToToken: env.AGENT_SWAP_TO,

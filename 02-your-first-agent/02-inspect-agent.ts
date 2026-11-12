@@ -41,7 +41,9 @@ export async function inspectAgent(agentId: string) {
     api.getPolicy(agentId),
     // Newest first; pass `next_cursor` as `cursor` for older revisions.
     api.getPolicyHistory(agentId, { limit: 5 }),
+    // The legacy public balance, which can only be shielded or withdrawn.
     api.getBalances(agentId, { source: "public" }),
+    // The account's own balance; omitting `source` reads it too.
     api.getBalances(agentId, { source: "confidential" }),
     api.listGrants(agentId),
     api.getHistory(agentId, { limit: 5 }),

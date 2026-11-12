@@ -7,6 +7,10 @@
  *        whose `actions` include `transfer` and whose `destinations` allow that recipient.
  * Run: `pnpm 05:transfer`
  *
+ * The transfer is confidential, the account's default: it spends the agent's confidential balance
+ * and the policy's `transfer` destination for the recipient must be confidential too
+ * (`confidential: true`). `confidential: false` is refused with `public_balance_exit_only`.
+ *
  * Idempotency keys name one logical request. Pass a stable key (`order-123`) when your system
  * already identifies the transfer; a generated key is fine for a one-off. Never derive it from the
  * agent and recipient alone: a second payment to the same person would replay the first. On a

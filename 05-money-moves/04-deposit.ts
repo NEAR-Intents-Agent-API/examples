@@ -1,7 +1,7 @@
 /**
  * Issue a deposit address and wait for funds.
  *
- * What: creates a deposit address that credits the agent's Intents balance, then polls.
+ * What: creates a deposit address that credits the agent's confidential balance, then polls.
  * When: funding an agent from another chain or token.
  * Needs: `AGENT_ALLOW_WRITES=true`, `NEAR_INTENTS_AGENT_API_KEY`, `AGENT_ID`. No grant: inbound funding never
  *        spends agent funds.
@@ -19,7 +19,8 @@
  * day after `details.expires_at`; a deposit with a known deposit tx or amount never expires, and a
  * late payment is refunded to `refund_to`.
  *
- * `shield`/`unshield` move between existing balances; this endpoint brings in new value.
+ * Deposits always credit the confidential balance: `confidential: false` is refused with
+ * `public_balance_exit_only`. `shield` moves legacy public funds in; this endpoint brings in new value.
  */
 import { createIdempotencyKey } from "@near-intents-agent-api/sdk";
 import { agentApi } from "../support/client.js";
