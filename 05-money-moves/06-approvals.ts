@@ -42,7 +42,8 @@ export async function approvals(agentId: string) {
 
   const approvalId = execution.details.approval_id;
   if (!approvalId) throw new Error("pending approval without approval_id");
-  // An owner dashboard lists every request waiting for a vote; one approval reads by id.
+  // An owner dashboard lists the requests waiting for a vote (at most 100 per agent; the next is
+  // refused with `approval_backlog_full` until the owner votes); one approval reads by id.
   const queue = await api.listApprovals(agentId);
   const pending = await api.getApproval(agentId, approvalId);
   const voteStatus = await runOwnerIntent(
