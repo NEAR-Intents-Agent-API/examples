@@ -8,7 +8,8 @@
  *
  * Revocation stops only the work that grant authorizes; other grants and the API key are
  * untouched. Work already committed to dispatch cannot be recalled: the response lists its
- * correlation ids in `committed_correlation_ids`.
+ * correlation ids in `committed_correlation_ids`, and limit-order cancels made with the grant that
+ * may still reach the provider in `committed_cancellations`.
  */
 import { agentApi } from "../support/client.js";
 import { banner, config, isMainModule, print, required, requireWrites } from "../support/config.js";
@@ -41,6 +42,9 @@ export async function revokeAndAudit(agentId: string) {
     // Work that reached its dispatch commitment before the revocation is not recalled.
     committed_correlation_ids:
       status.type === "grant_revoke" ? status.details.committed_correlation_ids : null,
+    // Limit-order cancels sent with this grant that may still reach the provider: read those orders.
+    committed_cancellations:
+      status.type === "grant_revoke" ? status.details.committed_cancellations : null,
     live_grants: grants
       .filter((grant) => grant.revoked_at === null && Date.parse(grant.expires_at) > Date.now())
       .map((grant) => ({
