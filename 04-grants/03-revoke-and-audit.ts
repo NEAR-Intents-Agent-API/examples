@@ -2,9 +2,13 @@
  * Revoke one grant and see what remains.
  *
  * What: revokes the stored grant, then reads the containment report and grant list.
- * When: when a session ends, a client disconnects, or a token may be compromised.
+ * When: when a session ends, a client disconnects, or a token or key may be compromised.
  * Needs: `AGENT_ALLOW_WRITES=true`, owner keys, `AGENT_ID`.
- * Run: `pnpm 04:revoke-and-audit`
+ * Run: `pnpm 04:revoke-and-audit [grant_id]`
+ *
+ * Without an argument it revokes the grant stored by `04:issue-grant`. Pass a `grant_id` to revoke
+ * any other grant: a key grant from `04:issue-key-grant` (`.intents/<agent>.key-grant.json`), an
+ * OIDC grant, or one from `listGrants`. Revoking a federated grant ends its sessions at once.
  *
  * Revocation stops only the work that grant authorizes; other grants and the API key are
  * untouched. Work already committed to dispatch cannot be recalled: the response lists its
@@ -18,15 +22,15 @@ import { loadGrant } from "../support/grant-store.js";
 import { loadOwner } from "../support/near-owner.js";
 import { signNearIntent } from "../support/sign-near-intent.js";
 
-export async function revokeAndAudit(agentId: string) {
+export async function revokeAndAudit(agentId: string, grantId?: string) {
   const settings = config();
   const api = agentApi();
   const { keyPair } = loadOwner();
-  const stored = await loadGrant(agentId);
+  const target = grantId ?? (await loadGrant(agentId)).grant_id;
 
   const status = await runOwnerIntent(
     api,
-    { type: "grant_revoke", agent_id: agentId, grant_id: stored.grant_id },
+    { type: "grant_revoke", agent_id: agentId, grant_id: target },
     (generated) => signNearIntent(generated, keyPair, settings.nearRpcUrl),
     { idempotencyKey: crypto.randomUUID() },
   );
@@ -38,7 +42,7 @@ export async function revokeAndAudit(agentId: string) {
     api.getContainment(agentId),
   ]);
   return {
-    revoked: status.type === "grant_revoke" ? status.details.grant_id : stored.grant_id,
+    revoked: status.type === "grant_revoke" ? status.details.grant_id : target,
     // Work that reached its dispatch commitment before the revocation is not recalled.
     committed_correlation_ids:
       status.type === "grant_revoke" ? status.details.committed_correlation_ids : null,
@@ -63,5 +67,5 @@ export async function revokeAndAudit(agentId: string) {
 if (isMainModule(import.meta.url)) {
   requireWrites("revoking a grant");
   banner(["Revoking the stored grant and auditing what remains…"]);
-  void revokeAndAudit(required(config().agentId, "AGENT_ID")).then(print);
+  void revokeAndAudit(required(config().agentId, "AGENT_ID"), process.argv[2]).then(print);
 }

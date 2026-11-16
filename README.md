@@ -46,12 +46,12 @@ Each numbered folder has its own README and numbered scripts. Every file starts 
 | [`01-getting-started`](01-getting-started/README.md) | Connectivity, token catalog | No |
 | [`02-your-first-agent`](02-your-first-agent/README.md) | Onboarding, reading an account | Yes (on-chain) |
 | [`03-owner-wallets`](03-owner-wallets/README.md) | NEAR, EVM and passkey owners | Yes |
-| [`04-grants`](04-grants/README.md) | Delegated access: issue, use, revoke | Yes |
+| [`04-grants`](04-grants/README.md) | Delegated access: issue, use, revoke; key-bound and OIDC (workload identity) grants | Yes |
 | [`05-money-moves`](05-money-moves/README.md) | Swap, limit orders, transfer, withdraw, deposit, confidential balance, approvals | Yes |
 | [`06-policy-and-lifecycle`](06-policy-and-lifecycle/README.md) | Edit rules, schedule hours, freeze, archive, delete | Yes |
 | [`07-native-accounts`](07-native-accounts/README.md) | Agent's own NEAR, EVM and Solana keys: NEP-413 logins, typed data, signed 1Click deposits, Solana sign-in and transfers | Some |
 | [`08-errors-and-recovery`](08-errors-and-recovery/README.md) | Error codes, statuses, idempotency, recovery | Some |
-| [`09-raw-http`](09-raw-http/README.md) | The same API with plain `fetch` and curl | Some |
+| [`09-raw-http`](09-raw-http/README.md) | The same API with plain `fetch` and curl, grant exchange and proofs included | Some |
 | [`10-recipes`](10-recipes/README.md) | BFF, timelocks, AI assistants, full journey | Yes |
 | [`11-verify-operations`](11-verify-operations/README.md) | Prove an execution's audit trail offline; payment receipts | Some |
 
@@ -62,7 +62,7 @@ Each numbered folder has its own README and numbered scripts. Every file starts 
 - **Dry-run first.** Swaps, withdrawals and delegated actions default to preview mode; set
   `AGENT_EXECUTE=true` to execute.
 - **Never commit `.env`.** It is gitignored, as is `.intents/`, where the examples cache a grant
-  token between scripts. A real backend stores it encrypted in its database.
+  token, or a workload key, between scripts. A real backend stores it encrypted in its database.
 
 ## The model in one paragraph
 
@@ -76,6 +76,11 @@ overrides another. The optional `native` block switches on the agent's own NEAR,
 keys, one method at a time; it is off by default, only `destinations` binds it (for the NEAR it
 sends), and the NEAR key never signs for the NEAR Intents contracts. The EVM and Solana keys sign
 Intents payloads only through `sign_intent`, under rules of their own.
+
+A grant's credential is a token your backend holds, or, to leave nothing long-lived on the
+workload, an OIDC identity (GitHub Actions, Google Cloud, AWS, Kubernetes, …) or a key it holds:
+the owner signs the binding, and the workload trades its identity for a short session or signs each
+request.
 
 ## SDK or HTTP
 
@@ -108,7 +113,9 @@ use `@simplewebauthn/browser` in your frontend.
 | `near-owner.ts`, `sign-near-intent.ts` | NEAR owner: keypair, NEP-413, NEP-366 |
 | `evm-owner.ts` | EVM owner: `viem`, EIP-712 |
 | `raw-http.ts` | Plain `fetch` transport |
-| `destinations.ts`, `grant-store.ts`, `format.ts` | Typed destinations, example-only grant cache, atomic ↔ decimal conversion |
+| `destinations.ts`, `grant-store.ts`, `format.ts` | Typed destinations, example-only grant and key-grant cache, atomic ↔ decimal conversion |
+| `der-signature.ts` | DER ECDSA signature → the raw `r \| s` a KMS-backed `WorkloadSigner` returns |
+| `raw-workload.ts` | Hand-built key assertions and grant proofs with `node:crypto` (`09-raw-http`) |
 | `identity.ts` | NEP-413 login requests and verification (the relying party's side) |
 | `native.ts` | The `native` policy block: `nativeOff`, `allOff`, `changePolicy`, the example EIP-712 domain |
 | `one-click.ts` | 1Click quote, `generate-intent`, `submit-intent` and status with plain `fetch` |

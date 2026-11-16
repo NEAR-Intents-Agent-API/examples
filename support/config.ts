@@ -24,6 +24,8 @@ export type ExampleConfig = {
   signRecipient?: string;
   withdrawAddress?: string;
   solanaRecipient?: string;
+  githubRepository?: string;
+  githubEnvironment: string;
   oneClickApiKey?: string;
   /** The transparency log origin proofs must name; pinned by you, never read from the API. */
   logOrigin: string;
@@ -60,6 +62,8 @@ export function config(): ExampleConfig {
     signRecipient: env.AGENT_SIGN_RECIPIENT,
     withdrawAddress: env.AGENT_WITHDRAW_ADDRESS,
     solanaRecipient: env.AGENT_SOLANA_RECIPIENT,
+    githubRepository: env.AGENT_GITHUB_REPOSITORY,
+    githubEnvironment: env.AGENT_GITHUB_ENVIRONMENT,
     oneClickApiKey: env.ONE_CLICK_API_KEY,
     // A deployment's log is `<API host>/log`: `api.agentsonintents.com/log` for the hosted API.
     logOrigin: env.AGENT_LOG_ORIGIN ?? `${api.host}/log`,

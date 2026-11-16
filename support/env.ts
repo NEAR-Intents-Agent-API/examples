@@ -46,6 +46,14 @@ export const exampleEnvSchema = z.object({
     .trim()
     .regex(/^[0-9a-f]{64}$/, "a 64-character lowercase hex public key")
     .optional(),
+  /** `owner/repo` of the GitHub repository an OIDC grant pins (`04:issue-oidc-grant`). */
+  AGENT_GITHUB_REPOSITORY: z
+    .string()
+    .trim()
+    .regex(/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/, "a GitHub repository such as owner/repo")
+    .optional(),
+  /** The GitHub environment the grant pins; protection rules on it gate who can use the grant. */
+  AGENT_GITHUB_ENVIRONMENT: z.string().trim().min(1).default("production"),
   AGENT_TOKEN: z.string().trim().min(1).default("nep141:wrap.near"),
   AGENT_SWAP_TO: z.string().trim().min(1).default("nep141:usdt.tether-token.near"),
   AGENT_TRANSFER_AMOUNT: z
