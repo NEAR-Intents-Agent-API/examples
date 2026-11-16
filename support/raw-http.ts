@@ -12,6 +12,11 @@ export type RawRequest = {
   method?: "GET" | "POST" | "DELETE";
   path: string;
   body?: unknown;
+  /**
+   * The exact body text to send, instead of serializing `body`. A grant proof signs the body's
+   * bytes, so the caller serializes once, hashes that text and sends the same text.
+   */
+  bodyText?: string;
   headers?: Record<string, string>;
   timeoutMs?: number;
   /** Public endpoints (`/v1/tokens`, `/v1/network`) do not need an API key. */
@@ -71,11 +76,13 @@ function errorLayer(value: unknown): string | undefined {
 export async function rawRequest<T>(request: RawRequest): Promise<T> {
   const { apiUrl } = config();
   const headers = authHeaders(request);
-  if (request.body !== undefined) headers.set("content-type", "application/json");
+  const body =
+    request.bodyText ?? (request.body === undefined ? undefined : JSON.stringify(request.body));
+  if (body !== undefined) headers.set("content-type", "application/json");
   const response = await fetch(`${apiUrl}${request.path}`, {
     method: request.method ?? "GET",
     headers,
-    body: request.body === undefined ? undefined : JSON.stringify(request.body),
+    body,
     redirect: "error",
     signal: AbortSignal.timeout(request.timeoutMs ?? 65_000),
   });

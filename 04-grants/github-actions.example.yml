@@ -1,0 +1,49 @@
+# A GitHub Actions job that acts on an agent account with no stored grant token.
+#
+# This is a sample, not a workflow of this folder: copy it to `.github/workflows/` of the repository
+# that `pnpm 04:issue-oidc-grant` bound the grant to, and adjust the paths. It runs only on
+# GitHub's runners: the identity token exists only there.
+#
+# Set in the repository (Settings, Secrets and variables, Actions):
+#   secret   NEAR_INTENTS_AGENT_API_KEY   the partner API key (still required on every call)
+#   variable NEAR_INTENTS_AGENT_API_URL   https://api.agentsonintents.com
+#   variable AGENT_ID                     the agent account
+#   variable AGENT_RECIPIENT              where the previewed withdrawal would go
+
+name: agent-preview
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write # lets the job request an OIDC token; without it GitHub issues none
+
+jobs:
+  act:
+    runs-on: ubuntu-latest
+    # Must match the `environment` the grant pins (AGENT_GITHUB_ENVIRONMENT, default production).
+    # Protection rules on this environment are what gate who can use the grant.
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: pnpm install
+        working-directory: examples
+      - run: pnpm 04:delegate-from-ci
+        working-directory: examples
+        env:
+          NEAR_INTENTS_AGENT_API_KEY: ${{ secrets.NEAR_INTENTS_AGENT_API_KEY }}
+          NEAR_INTENTS_AGENT_API_URL: ${{ vars.NEAR_INTENTS_AGENT_API_URL }}
+          AGENT_ID: ${{ vars.AGENT_ID }}
+          AGENT_RECIPIENT: ${{ vars.AGENT_RECIPIENT }}
+
+# Without the script, the same exchange from any step (the API's docs/workload-identity.md):
+#
+#   AUD="$NEAR_INTENTS_AGENT_API_URL/v1/agents/$AGENT_ID"
+#   JWT=$(curl -sSf -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+#     "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=$AUD" | jq -r .value)
+#   # POST $JWT to /v1/agents/$AGENT_ID/grants/token, then send the ngs_ token as X-Grant-Token.

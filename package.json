@@ -20,6 +20,11 @@
     "04:issue-grant": "tsx --env-file-if-exists=.env 04-grants/01-issue-grant.ts",
     "04:delegate-client": "tsx --env-file-if-exists=.env 04-grants/02-delegate-client.ts",
     "04:revoke-and-audit": "tsx --env-file-if-exists=.env 04-grants/03-revoke-and-audit.ts",
+    "04:issue-key-grant": "tsx --env-file-if-exists=.env 04-grants/04-issue-key-grant.ts",
+    "04:delegate-with-key": "tsx --env-file-if-exists=.env 04-grants/05-delegate-with-key.ts",
+    "04:issue-oidc-grant": "tsx --env-file-if-exists=.env 04-grants/06-issue-oidc-grant.ts",
+    "04:delegate-from-ci": "tsx --env-file-if-exists=.env 04-grants/07-delegate-from-ci.ts",
+    "04:kms-signer": "tsx --env-file-if-exists=.env 04-grants/08-kms-signer.ts",
     "05:quote-and-swap": "tsx --env-file-if-exists=.env 05-money-moves/01-quote-and-swap.ts",
     "05:transfer": "tsx --env-file-if-exists=.env 05-money-moves/02-transfer.ts",
     "05:withdraw": "tsx --env-file-if-exists=.env 05-money-moves/03-withdraw.ts",
@@ -49,6 +54,8 @@
     "09:owner-flow": "tsx --env-file-if-exists=.env 09-raw-http/02-owner-flow.ts",
     "09:execution": "tsx --env-file-if-exists=.env 09-raw-http/03-execution.ts",
     "09:native": "tsx --env-file-if-exists=.env 09-raw-http/04-native.ts",
+    "09:grant-exchange": "tsx --env-file-if-exists=.env 09-raw-http/05-grant-exchange.ts",
+    "09:grant-proof": "tsx --env-file-if-exists=.env 09-raw-http/06-grant-proof.ts",
     "10:bff-pattern": "tsx --env-file-if-exists=.env 10-recipes/01-bff-pattern.ts",
     "10:timelocked-payout": "tsx --env-file-if-exists=.env 10-recipes/02-timelocked-payout.ts",
     "10:ai-assistant": "tsx --env-file-if-exists=.env 10-recipes/03-ai-assistant.ts",
@@ -58,7 +65,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@near-intents-agent-api/sdk": "^0.9.1",
+    "@near-intents-agent-api/sdk": "^0.9.2",
     "near-api-js": "^7.2.0",
     "viem": "^2.56.8",
     "zod": "^4.6.4"
