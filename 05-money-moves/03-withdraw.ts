@@ -24,8 +24,8 @@
  * (`insufficient_balance` with `available_amount`) is listed in `warnings`, so read them before the
  * live withdrawal. An unlisted token (`unsupported_token`) or an invalid address (`invalid_address`)
  * refuses the preview itself, before any provider call. So does a token withdrawn to a NEAR account
- * with no storage on that token's contract (`invalid_address`, 409): register the receiver's
- * storage first, or move the funds inside NEAR Intents. Each preview counts toward the
+ * with no storage on that token's contract (`recipient_storage_unregistered`, 409): register the
+ * receiver's storage first, or move the funds inside NEAR Intents. Each preview counts toward the
  * wallet's 1,000 daily custody operations at the provider. As with a swap, `details.amount_out` in
  * the live status is final only on `SUCCESS`; before that read `details.expected_amount_out`.
  */
