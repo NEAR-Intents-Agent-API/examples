@@ -6,7 +6,7 @@ Read this before writing retry logic. Mistakes here cost real money.
 |---|---|---|
 | `01-error-taxonomy.ts` | `pnpm 08:error-taxonomy` | `AgentApiError` fields and the codes you will actually see |
 | `02-status-and-uncertain.ts` | `pnpm 08:status-and-uncertain` | Observing a status, `refresh`, and when recovery is legal |
-| `03-idempotency.ts` | `pnpm 08:idempotency` | Stable keys, persisting before dispatch, replay behavior |
+| `03-idempotency.ts` | `pnpm 08:idempotency` | Stable keys, persisting before dispatch, replay behavior, finding an operation from its key after a lost response |
 | `04-recover.ts` | `pnpm 08:recover <record.json>` | The three facts that make `/recover` legal, then recovery with the original key and grant |
 
 ## Branch on `code`, never `title`
@@ -103,5 +103,11 @@ An `Idempotency-Key` names one logical request. Same key + same body = the same 
 same key + different body = `idempotency_conflict`. Generate the key, **persist it with your
 intent**, then send. On a transport error, retry with that stored key. Never let a process
 restart mint a fresh key for work that may already have happened.
+
+If the response was lost and you kept the key but not the `correlation_id`,
+`lookupOperations(agentId, idempotencyKey)` returns `{ data, retired }`: the retained operations the
+key admitted (follow each with `getStatus`) and the ids whose detail was purged after retention. It
+needs the API key alone, no grant, and sends nothing. Two empty lists are inconclusive: only a
+replay under the same key, body and grant settles it. See `03-idempotency.ts`.
 
 Next: [09 · Raw HTTP](../09-raw-http/README.md).
