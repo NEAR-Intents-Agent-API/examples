@@ -23,14 +23,6 @@ import { loadGrant } from "../support/grant-store.js";
 import { loadOwner } from "../support/near-owner.js";
 import { signNearIntent } from "../support/sign-near-intent.js";
 
-/** One owner vote on an approval. The published SDK types do not carry `votes` yet. */
-type ApprovalVote = { voter: string; verdict: "approve" | "reject"; voted_at: string };
-
-const votesOf = (approval: object): ApprovalVote[] | undefined =>
-  "votes" in approval && Array.isArray(approval.votes)
-    ? (approval.votes as ApprovalVote[])
-    : undefined;
-
 export async function approvals(agentId: string) {
   const settings = config();
   const api = agentApi();
@@ -77,7 +69,7 @@ export async function approvals(agentId: string) {
     })),
     request_type: pending.request_type,
     verdict: "approve",
-    votes: votesOf(decided),
+    votes: decided.votes,
     execution: {
       correlation_id: settled.correlation_id,
       status: settled.status,

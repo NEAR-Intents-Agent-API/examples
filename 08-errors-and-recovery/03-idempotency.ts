@@ -1,7 +1,8 @@
 /**
  * Idempotency: same key, same work; new key, new work.
  *
- * What: runs a request twice with the same key (replay), then shows how a lost reply is recovered.
+ * What: runs a request twice with the same key (replay), then finds the operation again from the
+ *       key alone, as you would after a lost reply.
  * When: before writing any retry logic. This is the whole contract in one file.
  * Needs: `AGENT_ALLOW_WRITES=true`, `AGENT_ID`, `AGENT_RECIPIENT`, stored grant.
  * Run: `pnpm 08:idempotency`
@@ -9,6 +10,8 @@
  * Rules:
  * - Generate the key, persist it with the request, *then* send.
  * - Retry a transport error with the stored key; the server returns the stored outcome.
+ * - If the reply was lost and you kept only the key, `lookupOperations` returns the correlation ids
+ *   it admitted (API key alone, no grant) without sending the request again.
  * - Same key with a different body is refused with `idempotency_conflict`.
  * - Each call with an omitted key is new work; the SDK returns the generated key with the result.
  */
@@ -32,6 +35,10 @@ export async function idempotency(agentId: string) {
   // The same key with the same body returns the stored operation — no second transfer.
   const replay = await bot.transfer(agentId, request, { idempotencyKey });
 
+  // Lost reply, key kept: this finds what the key admitted. Empty lists prove nothing; only a
+  // replay under the same key, body and grant settles it.
+  const { data: admitted, retired } = await api.lookupOperations(agentId, idempotencyKey);
+
   let conflict: string | null = null;
   try {
     // Same key, different body: refused, never executed.
@@ -52,8 +59,13 @@ export async function idempotency(agentId: string) {
       status: replay.status,
       same_correlation_id: first.correlation_id === replay.correlation_id,
     },
+    lookup_by_key: {
+      correlation_ids: admitted.map((operation) => operation.correlation_id),
+      retired,
+      found_first: admitted.some((operation) => operation.correlation_id === first.correlation_id),
+    },
     different_body_with_same_key: conflict,
-    note: "Persist the key before sending; retries must reuse it, never mint a new one.",
+    note: "Persist the key before sending; retries and lookups must reuse it, never mint a new one.",
   };
 }
 
