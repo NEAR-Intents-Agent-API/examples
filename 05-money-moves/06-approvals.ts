@@ -12,7 +12,9 @@
  * approver. Here a vote is a `nep413` off-chain signature by the owner; an EVM or passkey owner
  * signs an EIP-712 or WebAuthn authorization that its `0s` wallet confirms. Voting is idempotent: resubmitting the same signature is
  * safe. `SUCCESS` on the vote means the vote was recorded, not that the transfer settled —
- * follow the *execution's* original correlation id for that.
+ * follow the *execution's* original correlation id for that. An approval lists the owner votes the
+ * API recorded as `votes` (`{ voter, verdict, voted_at }`, oldest first), so the example reads the
+ * approval again after voting and prints them.
  */
 import { agentApi } from "../support/client.js";
 import { banner, config, isMainModule, print, required, requireWrites } from "../support/config.js";
@@ -20,6 +22,14 @@ import { runOwnerIntent, settleApprovedExecution } from "../support/flow.js";
 import { loadGrant } from "../support/grant-store.js";
 import { loadOwner } from "../support/near-owner.js";
 import { signNearIntent } from "../support/sign-near-intent.js";
+
+/** One owner vote on an approval. The published SDK types do not carry `votes` yet. */
+type ApprovalVote = { voter: string; verdict: "approve" | "reject"; voted_at: string };
+
+const votesOf = (approval: object): ApprovalVote[] | undefined =>
+  "votes" in approval && Array.isArray(approval.votes)
+    ? (approval.votes as ApprovalVote[])
+    : undefined;
 
 export async function approvals(agentId: string) {
   const settings = config();
@@ -54,6 +64,7 @@ export async function approvals(agentId: string) {
   );
   if (voteStatus.status !== "SUCCESS")
     throw new Error(voteStatus.failure_code ?? `vote ${voteStatus.status}`);
+  const decided = await api.getApproval(agentId, approvalId);
 
   // The vote unblocks the execution; observe the execution's own correlation id until it leaves
   // PENDING_APPROVAL and settles.
@@ -66,6 +77,7 @@ export async function approvals(agentId: string) {
     })),
     request_type: pending.request_type,
     verdict: "approve",
+    votes: votesOf(decided),
     execution: {
       correlation_id: settled.correlation_id,
       status: settled.status,

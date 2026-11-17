@@ -11,10 +11,11 @@ No preview refuses for rules or balance. Every rule the live request would fail 
 `warnings`: `policy_action_denied`, `policy_destination_denied` and `insufficient_balance` (with
 `available_amount`), beside the budget, limit and schedule codes, `high_fee` and
 `asset_delivered_as_is`. Read them before you execute. An unlisted asset (`unsupported_token`) or an
-invalid recipient (`invalid_address`) refuses the preview itself, before any provider call. So does
-a token withdrawal to a NEAR account with no storage on that token's contract, such as a fresh 1Click
-deposit address for NEAR USDC: it answers `invalid_address` (409). Register the receiver's storage
-first (NEP-145 `storage_deposit`), or move the funds inside NEAR Intents.
+invalid recipient (`invalid_address`: a bad address, or a named NEAR account that does not exist)
+refuses the preview itself, before any provider call. So does a token withdrawal to a NEAR account
+with no storage on that token's contract, such as a fresh 1Click deposit address for NEAR USDC: it
+answers `recipient_storage_unregistered` (409). Register the receiver's storage first (NEP-145
+`storage_deposit`), or move the funds inside NEAR Intents.
 
 ## Confidential by default
 

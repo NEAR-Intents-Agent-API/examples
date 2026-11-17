@@ -42,7 +42,7 @@ Every error also names the layer that refused. Read it when you need to decide w
 | `confidential: false` on a swap, limit order, transfer or deposit address, or any `unshield` (400, `request` layer) | `public_balance_exit_only` | Leave `confidential` out: the confidential balance is the account. Legacy public funds leave only by `shield` or a withdrawal with `confidential: false`; a plain refusal, so fix the request |
 | Not enough available balance | `insufficient_balance` | Fund the account or send at most `availableAmount` |
 | The agent's own NEAR account holds less NEAR than the operation needs (a native NEAR call, or any custody operation that costs NEAR) | `custody_native_balance_required` | Fund `wallet.near_account_id`; `minAmount` is the call's cost and `availableAmount` what the account holds, both in yoctoNEAR (`details.available_amount` repeats the latter) |
-| Withdrawal to a NEAR account with no storage on the token's contract | `invalid_address` (409) | Register the receiver's storage (NEP-145), or move the funds inside NEAR Intents |
+| Withdrawal to a NEAR account with no storage on the token's contract | `recipient_storage_unregistered` (409, `request` layer, not retryable) | Register the receiver's storage (NEP-145 `storage_deposit`), or move the funds inside NEAR Intents, then send again under a new key |
 | Limit order priced too far from the market | `policy_price_deviation_exceeded` | Price within `limit_order.max_deviation_bps` of the market, or the owner raises it |
 | No fresh price for a limit order's assets | `market_price_unavailable` | Retry later; nothing was sent |
 | Amount below the route's minimum, or a limit order worth under 0.1 USD | `amount_too_low` | Send more (`minAmount` states the route's minimum) |
