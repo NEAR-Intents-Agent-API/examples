@@ -33,7 +33,7 @@ only has a way out: `shield` moves it into the confidential balance, and a withd
 | `03-withdraw.ts` | `pnpm 05:withdraw` | `actions: ["withdraw"]` + chain address | Previews, then withdraws cross-chain |
 | `04-deposit.ts` | `pnpm 05:deposit` | nothing | Issues an address (`origin_asset`, optional `amount`); no grant, refunds go to the agent |
 | `05-private-balance.ts` | `pnpm 05:private-balance` | `confidential: true` | Reads both balances, shields legacy public funds, previews a public withdrawal |
-| `06-approvals.ts` | `pnpm 05:approvals` | `owner_approval: true` | `PENDING_APPROVAL` → owner vote → settle |
+| `06-approvals.ts` | `pnpm 05:approvals` (`reject` to reject) | `owner_approval: true` | `PENDING_APPROVAL` → owner vote → settle |
 | `07-limit-order.ts` | `pnpm 05:limit-order` | `actions: ["limit_order"]` | Previews with the API key alone; places a resting order when `AGENT_EXECUTE=true`; needs `AGENT_LIMIT_PRICE` |
 | `08-limit-orders.ts` | `pnpm 05:limit-orders` | nothing (cancels need only a grant) | Lists, reads, cancels one, cancels all; cancels only when `AGENT_EXECUTE=true` |
 
