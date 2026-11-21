@@ -26,7 +26,9 @@ import { signNep413 } from "./near-owner.js";
  * Select the method from `intent.standard`; never rebuild or reorder the payload.
  *
  * `nep366` is a gasless delegate action: the API's sponsor submits it on chain. It needs the
- * owner's current access-key nonce, which is why `rpcUrl` is required.
+ * owner's current access-key nonce, which is why `rpcUrl` is required. The key is read at
+ * `optimistic` finality: the API acknowledges an owner write before it is final, so a `final` read
+ * right after one can return the previous nonce.
  */
 export async function signNearIntent(
   generated: GenerateIntentResponse,
@@ -50,7 +52,7 @@ export async function signNearIntent(
   const access = await provider.viewAccessKey({
     accountId: signer.account_id,
     publicKey: signer.public_key,
-    finalityQuery: { finality: "final" },
+    finalityQuery: { finality: "optimistic" },
   });
   const delegateAction = {
     senderId: signer.account_id,
