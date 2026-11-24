@@ -44,7 +44,7 @@ Each numbered folder has its own README and numbered scripts. Every file starts 
 | Folder | Topic | Writes? |
 |---|---|---|
 | [`01-getting-started`](01-getting-started/README.md) | Connectivity, token catalog | No |
-| [`02-your-first-agent`](02-your-first-agent/README.md) | Onboarding, reading an account | Yes (on-chain) |
+| [`02-your-first-agent`](02-your-first-agent/README.md) | Onboarding (optionally with the first grant in the same signature), reading an account | Yes (on-chain) |
 | [`03-owner-wallets`](03-owner-wallets/README.md) | NEAR, EVM and passkey owners | Yes |
 | [`04-grants`](04-grants/README.md) | Delegated access: issue, use, revoke; key-bound and OIDC (workload identity) grants | Yes |
 | [`05-money-moves`](05-money-moves/README.md) | Swap, limit orders, transfer, withdraw, deposit, confidential balance, approvals | Yes |

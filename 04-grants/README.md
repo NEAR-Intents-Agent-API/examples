@@ -40,6 +40,10 @@ A grant carries no permissions. What every grantee may do is the account policy:
 Enable swaps with one `policy_update` and every live grant can swap at once — no new grant. A new
 account sends nowhere until the owner lists a destination the same way.
 
+To authorize the first grant in the same signature that creates the agent, pass it as `grant` to
+`agent_create` (`pnpm 02:create-with-grant`, see
+[02 · Your first agent](../02-your-first-agent/README.md)); later grants use `grant_issue`.
+
 Store the token encrypted on your backend. `api.forGrant(token)` returns a client that sends it
 as `X-Grant-Token` on delegated calls only.
 
