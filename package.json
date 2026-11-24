@@ -13,6 +13,7 @@
     "02:create-agent": "tsx --env-file-if-exists=.env 02-your-first-agent/01-create-agent.ts",
     "02:inspect-agent": "tsx --env-file-if-exists=.env 02-your-first-agent/02-inspect-agent.ts",
     "02:multiple-agents": "tsx --env-file-if-exists=.env 02-your-first-agent/03-multiple-agents.ts",
+    "02:create-with-grant": "tsx --env-file-if-exists=.env 02-your-first-agent/04-create-with-grant.ts",
     "03:near-policy-local": "tsx --env-file-if-exists=.env 03-owner-wallets/near/01-policy-local.ts",
     "03:near-policy-provider": "tsx --env-file-if-exists=.env 03-owner-wallets/near/02-policy-provider.ts",
     "03:evm-create-agent": "tsx --env-file-if-exists=.env 03-owner-wallets/evm/01-create-agent.ts",
@@ -65,7 +66,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@near-intents-agent-api/sdk": "^0.9.4",
+    "@near-intents-agent-api/sdk": "^0.9.5",
     "near-api-js": "^7.2.0",
     "viem": "^2.56.8",
     "zod": "^4.6.4"
