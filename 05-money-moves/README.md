@@ -17,6 +17,28 @@ with no storage on that token's contract, such as a fresh 1Click deposit address
 answers `recipient_storage_unregistered` (409). Register the receiver's storage first (NEP-145
 `storage_deposit`), or move the funds inside NEAR Intents.
 
+## Exact input or exact output
+
+`swap` and `withdraw` take one of two shapes:
+
+- **Exact input:** `amount`, the input spent, optionally with `min_amount_out`, the least the
+  recipient must get.
+- **Exact output:** `amount_out`, what the recipient gets exactly, with `max_amount_in`, the most
+  it may spend. Never send it with `amount` or `min_amount_out`.
+
+The examples run the exact-output shape with `exact-output` (`pnpm 05:quote-and-swap exact-output`,
+`pnpm 05:withdraw exact-output`): a dry run quotes the delivery, and `max_amount_in` is its
+`quote.amount_in` plus 1%, since a fresh quote at dispatch may need a little more. Unused input
+returns to the balance, but the balance check, limits and USD budget count all of `max_amount_in`.
+A settled exact-output request reports the input it spent in `details.amount_in`.
+
+The provider checks the figure against a fresh quote before anything is signed. A `max_amount_in`
+below the quote's `amount_in` is refused with `above_max_amount_in`, and a `min_amount_out` above
+the quote's guaranteed `quote.min_amount_out` with `below_min_amount_out` (both 409, nothing sent;
+change the figure and use a new key). A dry run whose quote already misses the figure warns with the
+same code. `withdraw` takes no `memo`, and a withdrawal from the public balance
+(`confidential: false`) to chain `near` takes `amount` alone.
+
 ## Confidential by default
 
 Every money request runs on the agent's confidential balance, and `getBalances` reads it unless
@@ -28,9 +50,9 @@ only has a way out: `shield` moves it into the confidential balance, and a withd
 
 | Example | Run | Policy must allow | Notes |
 |---|---|---|---|
-| `01-quote-and-swap.ts` | `pnpm 05:quote-and-swap` | `actions: ["swap"]` | Always quotes; live swap when `AGENT_EXECUTE=true` |
+| `01-quote-and-swap.ts` | `pnpm 05:quote-and-swap` (`exact-output` for the other shape) | `actions: ["swap"]` | Always quotes; live swap when `AGENT_EXECUTE=true` |
 | `02-transfer.ts` | `pnpm 05:transfer` | `actions: ["transfer"]` + recipient | Moves between NEAR Intents accounts |
-| `03-withdraw.ts` | `pnpm 05:withdraw` | `actions: ["withdraw"]` + chain address | Previews, then withdraws cross-chain |
+| `03-withdraw.ts` | `pnpm 05:withdraw` (`exact-output` for the other shape) | `actions: ["withdraw"]` + chain address | Previews, then withdraws cross-chain |
 | `04-deposit.ts` | `pnpm 05:deposit` | nothing | Issues an address (`origin_asset`, optional `amount`); no grant, refunds go to the agent |
 | `05-private-balance.ts` | `pnpm 05:private-balance` | `confidential: true` | Reads both balances, shields legacy public funds, previews a public withdrawal |
 | `06-approvals.ts` | `pnpm 05:approvals` (`reject` to reject) | `owner_approval: true` | `PENDING_APPROVAL` → owner vote → settle |
@@ -72,7 +94,8 @@ const request = await buildPolicyUpdate(api, agentId, (policy) => ({
 - `UNCERTAIN` means the outcome is unknown. **Never resubmit with a new key** — poll or
   reconcile the original `correlation_id`.
 - `details.amount_out` is final and present only on `SUCCESS` (or `REFUNDED` after a partial fill);
-  until then `details.expected_amount_out` is an estimate.
+  until then `details.expected_amount_out` is an estimate. A settled exact-output request also has
+  `details.amount_in`, the input it spent.
 - `NEEDS_REVIEW` stops automatic polling. Inspect `details.reason`; after provider/manual
   resolution, call `getStatus(correlation_id, { refresh: true })`.
 

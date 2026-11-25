@@ -40,6 +40,8 @@ Every error also names the layer that refused. Read it when you need to decide w
 | Per-asset limit or hourly action cap used up (shield counts too) | `policy_limit_exceeded`, `policy_action_limit_exceeded` | Wait for the window or the owner raises it; a plain refusal, so a new request needs a new key |
 | Earlier actions the API cannot count against a limit | `policy_usage_unavailable` | Nothing was sent; wait until they leave the window |
 | `confidential: false` on a swap, limit order, transfer or deposit address, or any `unshield` (400, `request` layer) | `public_balance_exit_only` | Leave `confidential` out: the confidential balance is the account. Legacy public funds leave only by `shield` or a withdrawal with `confidential: false`; a plain refusal, so fix the request |
+| `max_amount_in` below a fresh quote's `amount_in`, or `min_amount_out` above its guaranteed output | `above_max_amount_in`, `below_min_amount_out` (409, nothing sent) | Change the figure (leave 0.5-1% room above a dry run's quote) and send under a new key |
+| A queued (timelocked) request in a body shape the API no longer accepts | `request_no_longer_accepted` (failure code) | Send it again in the current shape |
 | Not enough available balance | `insufficient_balance` | Fund the account or send at most `availableAmount` |
 | The agent's own NEAR account holds less NEAR than the operation needs (a native NEAR call, or any custody operation that costs NEAR) | `custody_native_balance_required` | Fund `wallet.near_account_id`; `minAmount` is the call's cost and `availableAmount` what the account holds, both in yoctoNEAR (`details.available_amount` repeats the latter) |
 | Withdrawal to a NEAR account with no storage on the token's contract | `recipient_storage_unregistered` (409, `request` layer, not retryable) | Register the receiver's storage (NEP-145 `storage_deposit`), or move the funds inside NEAR Intents, then send again under a new key |
@@ -84,7 +86,8 @@ Rules:
 
 - Poll `PROCESSING`/`QUEUED`. `waitMs` long-polls at most 30 s.
 - `details.amount_out` is final and appears only on `SUCCESS` (or `REFUNDED` after a partial fill).
-  Before that, read `details.expected_amount_out`, an estimate.
+  Before that, read `details.expected_amount_out`, an estimate. A settled exact-output request also
+  has `details.amount_in`, the input it spent.
 - An unpaid deposit ends `FAILED` with `deposit_expired` one day after its `expires_at`; a late
   payment is refunded to `refund_to`.
 - `UNCERTAIN`: **never submit a new request with a new key.** Observe the original correlation id.
