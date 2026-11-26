@@ -86,14 +86,18 @@ const verified = await verifyPaymentReceipt(item.receipt, {
 ```
 
 - `verifyReceipt` checks any receipt and returns its terms; `verifyPaymentReceipt` also checks the
-  exact recipient, asset, amount and reference (plus `chain` and `memo` for a withdrawal) of a
-  transfer or withdrawal.
+  exact recipient, asset, amount and reference (plus `chain` for a withdrawal) of a transfer or
+  withdrawal. Give exactly one of `amount` (a transfer or exact-input withdrawal) and `amount_out`
+  (an exact-output withdrawal). `memo` matches only receipts of withdrawals made before the API
+  stopped taking one.
 - Leaving `expect.confidential` out accepts a confidential payment only, the account's default. A
   payment from the legacy public balance (a withdrawal sent with `confidential: false`) needs
   `expect.confidential: false`.
-- A withdrawal's `amount` is the debit, fees come out of it, so the receipt does not prove what
-  arrived; read `amountOut` or the destination chain. A limit order's receipt proves it was funded
-  and placed, not filled.
+- An exact-input withdrawal's `amount` is the debit, fees come out of it, so the receipt does not
+  prove what arrived; read `amountOut` or the destination chain. An exact-output withdrawal's
+  receipt proves it paid `amount_out` exactly, at most `maxAmountIn`: `VerifiedPayment.amount` is
+  absent (it is optional), `amountOut` and `maxAmountIn` are set. A limit order's receipt proves it
+  was funded and placed, not filled.
 - `ReceiptNotCoveredError` (the trusted head is older than the receipt) and `LogUnavailableError`
   say nothing about the receipt: fetch a newer head or wait, then verify again. `NoteError` or
   `ProofError` means it does not prove the settlement.

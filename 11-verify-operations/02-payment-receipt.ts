@@ -32,8 +32,12 @@
  * once. Leaving `expect.confidential` out accepts a confidential payment only, the account's
  * default; it settles on the provider's word with nothing to check on chain. A payment from the
  * legacy public balance (a withdrawal sent with `confidential: false`) matches only
- * `expect.confidential: false`. To check a withdrawal, add its `chain` and `memo` to `expect`; a
- * withdrawal's `amount` is the debit, so confirm what arrived from `amountOut` or on the chain.
+ * `expect.confidential: false`. To check a withdrawal, add its `chain` to `expect` (a withdrawal
+ * takes no memo; `memo` only matches receipts of older ones). Give `expect` exactly one of `amount`
+ * and `amount_out`. A transfer or exact-input withdrawal matches `amount`, the debit, so confirm
+ * what arrived from `amountOut` or on the chain. An exact-output withdrawal paid the recipient
+ * exactly `amount_out`: it matches `expect.amount_out`, and its `VerifiedPayment` has `amountOut`
+ * and `maxAmountIn` but no `amount`, which is optional.
  */
 import { setTimeout as sleep } from "node:timers/promises";
 import {
@@ -136,6 +140,7 @@ export async function paymentReceipt(agentId: string) {
             more: page.next_cursor !== null,
           },
           verified: true,
+          // `amount` is absent for an exact-output withdrawal; this transfer has one.
           payment: { ...payment, leafIndex: payment.leafIndex.toString() },
         };
       } catch (error) {
