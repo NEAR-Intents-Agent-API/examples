@@ -63,6 +63,7 @@ Every error also names the layer that refused. Read it when you need to decide w
 | Throttled | `policy_change_throttled`, `agent_unfreeze_throttled` | Back off until `availableAt` |
 | Stale policy revision | `policy_revision_conflict` | Read again, generate fresh |
 | Native refused | `signing_recipient_forbidden`, `signing_policy_denied`, `native_method_denied`, `native_contract_forbidden` | See [07 · Native accounts](../07-native-accounts/README.md#refusals) |
+| `payout_authorization_id` unknown, unsigned, spent, expired, for the other key or bound to another payload or grant | `payout_authorization_invalid` (409, `request` layer; `detail` says which) | The owner signs a new `payout_authorize` and you send its `correlation_id`; a payload no authorization covers is `policy_destination_denied` instead |
 
 Budget and limit refusals (`spend_budget_exceeded`, `spend_price_unavailable`,
 `policy_limit_exceeded`, `policy_action_limit_exceeded`, `policy_usage_unavailable`) on a request

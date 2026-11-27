@@ -18,9 +18,10 @@ deposit from the EVM key's Intents account, and Solana sign-in and transfers.
 | `07-sign-intent-deposit.ts` | `pnpm 07:sign-intent-deposit [withdraw]` | Quote at 1Click, sign the payload with the EVM key, publish `signed_data` (dry unless `AGENT_EXECUTE=true`) |
 | `08-enable-solana.ts` | `pnpm 07:enable-solana` | Owner lists a sign-in domain and turns on `sign_transfer` for one recipient |
 | `09-solana-sign-in-and-transfer.ts` | `pnpm 07:solana` | Sign-In-With-Solana and one signed SOL transfer; nothing is broadcast |
+| `10-payout-authorize.ts` | `pnpm 07:payout-authorize` | Owner signs `payout_authorize` for one payout outside the `sign_intent` lists; the grant client signs it with `payout_authorization_id` (dry unless `AGENT_EXECUTE=true`) |
 
 Set `AGENT_SIGN_RECIPIENT` in `.env` to the NEAR account or domain of the service the agent logs in to
-(for Solana, a lowercase domain). `06`–`09` also read `AGENT_WITHDRAW_ADDRESS` (an address on
+(for Solana, a lowercase domain). `06`–`10` also read `AGENT_WITHDRAW_ADDRESS` (an address on
 Base), `AGENT_SOLANA_RECIPIENT`, `AGENT_SOLANA_RPC_URL` and the optional `ONE_CLICK_API_KEY`.
 
 ## Off until the owner turns it on
@@ -119,6 +120,46 @@ writes the quote's deadline); any other payload within 300 seconds. `07` shows t
 quote with `dry: false`, `generate-intent`, `nativeEvmSignIntent` with `one_click_quotes: [quote]`,
 then publish `signed_data` as is (1Click `submit-intent`, `intents.near` or a solver relay).
 
+### One payout outside the lists
+
+To let the key pay a single 1Click deposit that `receivers` and `withdrawals` do not allow, without
+a policy change and its cooldown, the owner signs a `payout_authorize` intent and the agent
+names it in `sign-intent`:
+
+```ts
+const authorization = await api.generateIntent({
+  type: "payout_authorize",
+  agent_id: agentId,
+  key: "evm", // or "solana"
+  payout: {
+    origin_asset: "nep141:wrap.near",
+    amount_in: "1000000000000000000000000", // a ceiling
+    destination_asset: "nep141:base-0x833589fcd6edb6e08f4c7c32d4f71b54bda02913.omft.near",
+    min_amount_out: "3620000", // a floor
+    recipient: "0x…",
+    recipient_type: "DESTINATION_CHAIN",
+  },
+  valid_until: new Date(Date.now() + 60 * 60_000).toISOString(), // 5 minutes to 24 hours ahead
+});
+// The owner signs authorization.intent (preview.payout shows the terms); submitIntent sends it.
+// Its status reads PROCESSING until the agent uses it.
+await bot.nativeEvmSignIntent(agentId, {
+  payload,
+  one_click_quotes: [quote],
+  payout_authorization_id: authorization.correlation_id,
+});
+```
+
+The first deposit in the payload whose quote has the same assets, recipient and recipient type, an
+`amountIn` at most `amount_in` and a `minAmountOut` at least `min_amount_out` skips `receivers`,
+`withdrawals` and `one_click_deposits`. Every other check still applies (1Click's signature, the
+refund, `max_slippage_bps`, the exact payment), `sign_intent` must be on, and the payload's
+`deadline` may not be later than `valid_until`. The authorization pays one payload: the same request
+under the same grant signs it again until `valid_until`, another payload is refused. It reads
+`SUCCESS` with `details.signed_correlation_id` once signed, and `FAILED` (`payout_authorization_expired`)
+if unused at `valid_until`, or `payout_authorization_voided` if a policy change freezes the account
+or switches `sign_intent` off first. `10-payout-authorize.ts` shows the whole flow.
+
 A signed payload can be published by anyone who holds it until its deadline. **Freezing the account
 refuses new payloads but cannot recall one already signed.** List only the owner's own addresses in
 `withdrawals`, and sign payloads that are due soon.
@@ -173,6 +214,7 @@ account on chain (or the key an implicit account is derived from).
 | `agent_grant_required` | 403 | No live `X-Grant-Token` |
 | `signing_policy_denied` | 403 | The recipient is not in `native.near.sign_message` |
 | `native_method_denied` | 403 | Any other method whose switch is off, or a contract or domain not listed |
+| `payout_authorization_invalid` | 409 | `payout_authorization_id` is unknown, not yet signed, spent, expired, for the other key or another payload or grant, or signed by a previous owner |
 
 The checks run in that order, so a request with several problems gets the first code.
 

@@ -57,6 +57,27 @@ const generated = await api.generateIntent(
 // generated.intent.payload is a PublicKeyCredentialRequestOptionsJSON (WebAuthn field names).
 ```
 
+## Backend: check what the owner will sign
+
+A passkey signs only a 32-byte challenge, which the owner cannot read. Every `webauthn` intent
+therefore carries the message that challenge hashes in its preview: `preview.wallet_request` for a
+step the wallet contract runs, or `preview.offchain_message` (NEP-641) for a consent step such as
+`grant_issue`, `grant_revoke`, `approval_vote` or `payout_authorize`. Before the owner signs, check on
+your backend that the challenge really hashes it, then show the owner that message:
+
+```ts
+import { verifyPasskeyChallenge } from "@near-intents-agent-api/sdk";
+
+if (generated.intent.standard === "webauthn" && !verifyPasskeyChallenge(generated))
+  throw new Error("the passkey challenge does not hash the previewed message");
+// Show preview.offchain_message.payload (or preview.wallet_request) to the owner, then sign.
+```
+
+`verifyPasskeyChallenge` recomputes the challenge from whichever preimage the response carries and
+compares it with `intent.payload.challenge`; it is `false` for an intent that is not `webauthn` or
+that carries no preimage. Without this check your backend would be relaying a challenge it cannot
+read. NEAR and EVM intents carry neither preimage: their `intent.payload` is the readable message.
+
 ## Browser: sign
 
 ```ts

@@ -26,6 +26,7 @@
     "04:issue-oidc-grant": "tsx --env-file-if-exists=.env 04-grants/06-issue-oidc-grant.ts",
     "04:delegate-from-ci": "tsx --env-file-if-exists=.env 04-grants/07-delegate-from-ci.ts",
     "04:kms-signer": "tsx --env-file-if-exists=.env 04-grants/08-kms-signer.ts",
+    "04:partner-revoke": "tsx --env-file-if-exists=.env 04-grants/09-partner-revoke.ts",
     "05:quote-and-swap": "tsx --env-file-if-exists=.env 05-money-moves/01-quote-and-swap.ts",
     "05:transfer": "tsx --env-file-if-exists=.env 05-money-moves/02-transfer.ts",
     "05:withdraw": "tsx --env-file-if-exists=.env 05-money-moves/03-withdraw.ts",
@@ -47,6 +48,7 @@
     "07:sign-intent-deposit": "tsx --env-file-if-exists=.env 07-native-accounts/07-sign-intent-deposit.ts",
     "07:enable-solana": "tsx --env-file-if-exists=.env 07-native-accounts/08-enable-solana.ts",
     "07:solana": "tsx --env-file-if-exists=.env 07-native-accounts/09-solana-sign-in-and-transfer.ts",
+    "07:payout-authorize": "tsx --env-file-if-exists=.env 07-native-accounts/10-payout-authorize.ts",
     "08:error-taxonomy": "tsx --env-file-if-exists=.env 08-errors-and-recovery/01-error-taxonomy.ts",
     "08:status-and-uncertain": "tsx --env-file-if-exists=.env 08-errors-and-recovery/02-status-and-uncertain.ts",
     "08:idempotency": "tsx --env-file-if-exists=.env 08-errors-and-recovery/03-idempotency.ts",
@@ -66,7 +68,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@near-intents-agent-api/sdk": "^0.9.6",
+    "@near-intents-agent-api/sdk": "^0.9.7",
     "near-api-js": "^7.2.0",
     "viem": "^2.56.8",
     "zod": "^4.6.4"
