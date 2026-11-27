@@ -46,10 +46,10 @@ Each numbered folder has its own README and numbered scripts. Every file starts 
 | [`01-getting-started`](01-getting-started/README.md) | Connectivity, token catalog | No |
 | [`02-your-first-agent`](02-your-first-agent/README.md) | Onboarding (optionally with the first grant in the same signature), reading an account | Yes (on-chain) |
 | [`03-owner-wallets`](03-owner-wallets/README.md) | NEAR, EVM and passkey owners | Yes |
-| [`04-grants`](04-grants/README.md) | Delegated access: issue, use, revoke; key-bound and OIDC (workload identity) grants | Yes |
+| [`04-grants`](04-grants/README.md) | Delegated access: issue, use, revoke (owner-signed, or by your backend with the API key alone); key-bound and OIDC (workload identity) grants | Yes |
 | [`05-money-moves`](05-money-moves/README.md) | Swap, limit orders, transfer, withdraw, deposit, confidential balance, approvals | Yes |
 | [`06-policy-and-lifecycle`](06-policy-and-lifecycle/README.md) | Edit rules, schedule hours, freeze, archive, delete | Yes |
-| [`07-native-accounts`](07-native-accounts/README.md) | Agent's own NEAR, EVM and Solana keys: NEP-413 logins, typed data, signed 1Click deposits, Solana sign-in and transfers | Some |
+| [`07-native-accounts`](07-native-accounts/README.md) | Agent's own NEAR, EVM and Solana keys: NEP-413 logins, typed data, signed 1Click deposits, owner-authorized one-off payouts, Solana sign-in and transfers | Some |
 | [`08-errors-and-recovery`](08-errors-and-recovery/README.md) | Error codes, statuses, idempotency, recovery | Some |
 | [`09-raw-http`](09-raw-http/README.md) | The same API with plain `fetch` and curl, grant exchange and proofs included | Some |
 | [`10-recipes`](10-recipes/README.md) | BFF, timelocks, AI assistants, full journey | Yes |
@@ -68,9 +68,9 @@ Each numbered folder has its own README and numbered scripts. Every file starts 
 
 An **agent** is one agent account: an agent wallet, one owner-signed **policy** and one USD usage
 ledger. **Access belongs to a grant; rules belong to the account.** Your backend holds the API
-key; the owner signs once to create the agent and once to issue each grant. The agent executes
-inside NEAR Intents, on its confidential balance, under all controls at once: the grant (who may act,
-until when), the policy (`actions`, `assets`, `limits`, `destinations`, owner approval, freeze),
+key; the owner signs once to create the agent and once to issue each grant (your backend can revoke
+grants alone). The agent executes inside NEAR Intents, on its confidential balance, under all
+controls at once: the grant (who may act, until when), the policy (`actions`, `assets`, `limits`, `destinations`, owner approval, freeze),
 the USD `budget`, the `timelock_ms` execution delay and the owner's `schedule` of hours. None
 overrides another. The optional `native` block switches on the agent's own NEAR, EVM and Solana
 keys, one method at a time; it is off by default, only `destinations` binds it (for the NEAR it

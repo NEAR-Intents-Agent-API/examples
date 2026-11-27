@@ -18,6 +18,7 @@ revoking one never touches another.
 | `06-issue-oidc-grant.ts` | `pnpm 04:issue-oidc-grant` | Bind a grant to a GitHub Actions repository and environment |
 | `07-delegate-from-ci.ts` | `pnpm 04:delegate-from-ci` | `forGrantSession(agentId, { subjectToken })` from a CI job (runs only inside GitHub Actions) |
 | `08-kms-signer.ts` | `pnpm 04:kms-signer` | A KMS-style signer that returns DER, converted to the JWS signature (offline) |
+| `09-partner-revoke.ts` | `pnpm 04:partner-revoke [grant_id \| all]` | Revoke one grant or all of them with the API key alone, no owner signature |
 
 ## The commitment trick
 
@@ -171,6 +172,37 @@ const bot = api.forGrantSession(agentId, { signer, grantId });
 
 Each `asymmetricSign` is a network call and a billed operation. `forGrantSession` signs once per
 session; `forGrantProof` signs once per request (and per retry), so prefer a session at high rates.
+
+## Revoking: the owner's way and yours
+
+Ending a grant is the one grant action your backend can take without the owner, because grants are
+API records and removing one needs no wallet signature:
+
+```ts
+await api.revokeGrant(agentId, grantId); // one grant
+await api.revokeAllGrants(agentId); // every live grant on the agent, in one call
+```
+
+| | Owner (`grant_revoke`, `03:revoke-and-audit`) | Partner (`09:partner-revoke`) |
+|---|---|---|
+| Authority | The owner's signature | The API key alone |
+| `revoked_reason` | `owner_revoked` | `partner_revoked` |
+| Issuing a new grant | The owner signs `grant_issue` | Still the owner's |
+| Freezing the account | The owner signs `agent_freeze` | Still the owner's |
+
+Either way the grant's next request is refused with `agent_grant_required` (a key-bound grant's
+proof, with `grant_proof_invalid`), its sessions end with it, and revoking one that is already
+revoked or expired returns it unchanged. Work already committed to dispatch is not recalled: the
+result lists it in `committed_correlation_ids` (follow each with `getStatus`), limit-order cancels
+that may still reach the provider in `committed_cancellations`, and sets `committed_truncated` when
+more than 100 exist. The owner's wallet and policy are untouched, so this is the stop for one
+compromised token; to stop the account itself, the owner freezes it. Treat the API key as the
+emergency stop it is and keep it off workloads and CI.
+
+```sh
+pnpm 04:partner-revoke          # the grant stored by 04:issue-grant, then proves its token is refused
+pnpm 04:partner-revoke all      # every live grant on the agent
+```
 
 ## Refusal codes name the blocking layer
 
