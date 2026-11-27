@@ -9,9 +9,12 @@
  *
  * Always quote first: `dry: true` returns expected output and fees with no authority and no
  * idempotency key. Set `min_amount_out` on the live request to send the provider a minimum output;
- * the quote does not apply it, and a swap reported below it reads `NEEDS_REVIEW`, never `SUCCESS`.
- * A live `min_amount_out` above the fresh quote's guaranteed `min_amount_out` is refused with
- * `below_min_amount_out` (409, nothing sent); a dry run whose quote already misses it warns.
+ * a swap reported below it reads `NEEDS_REVIEW`, never `SUCCESS`. Left out, the floor is the fresh
+ * quote's own `min_amount_out`. A live `min_amount_out` above the fresh quote's guaranteed
+ * `min_amount_out` is refused with `below_min_amount_out` (409, nothing sent), and
+ * `meta.quoted_min_amount_out` states that quote's figure; a dry run whose quote already misses it
+ * warns. The dry run's quote is an earlier one, so set the floor 0.5-1% below its
+ * `quote.min_amount_out`, more for a request a timelock or owner approval holds.
  *
  * Exact output (`exact-output`) fixes what the swap delivers: `amount_out` with `max_amount_in`,
  * the most it may spend, never with `amount` or `min_amount_out`. The ceiling here is the dry run's

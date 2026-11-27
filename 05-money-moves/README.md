@@ -35,8 +35,11 @@ A settled exact-output request reports the input it spent in `details.amount_in`
 The provider checks the figure against a fresh quote before anything is signed. A `max_amount_in`
 below the quote's `amount_in` is refused with `above_max_amount_in`, and a `min_amount_out` above
 the quote's guaranteed `quote.min_amount_out` with `below_min_amount_out` (both 409, nothing sent;
-change the figure and use a new key). A dry run whose quote already misses the figure warns with the
-same code. `withdraw` takes no `memo`, and a withdrawal from the public balance
+change the figure and use a new key). The refusal states the fresh quote's figure in
+`meta.quoted_min_amount_out` or `meta.quoted_amount_in` when the provider gives one: a gap of a few
+units is drift, a large one a real price move. Leave 0.5-1% room from a dry run's quote, more for a
+request a timelock or owner approval holds, since it is quoted when it releases. A dry run whose
+quote already misses the figure warns with the same code. `withdraw` takes no `memo`, and a withdrawal from the public balance
 (`confidential: false`) to chain `near` takes `amount` alone.
 
 ## Confidential by default
